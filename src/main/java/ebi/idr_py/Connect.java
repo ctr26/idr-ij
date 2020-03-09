@@ -14,6 +14,7 @@ public class Connect {
     public static final String password = "public";
     public static final String host = "idr.openmicroscopy.org";
     public static final int port = 0;
+    public static SecurityContext context;
     private ExperimenterData user;
 
     Connect() throws DSOutOfServiceException {
@@ -22,6 +23,7 @@ public class Connect {
         Logger simpleLogger = new SimpleLogger();
         gateway = new Gateway(simpleLogger);
         user = gateway.connect(cred);
+        context = new SecurityContext(user.getGroupId());
         System.out.println("Connected to IDR");
     }
 
@@ -30,6 +32,6 @@ public class Connect {
     }
 
     public SecurityContext getContext(){
-        return new SecurityContext(user.getGroupId());
+        return context;
     }
 }
