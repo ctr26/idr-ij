@@ -6,9 +6,18 @@
  *     https://unlicense.org/
  */
 package ebi.idr_py;
+import net.imagej.Dataset;
 import net.imagej.ImageJ;
-
+import ij.IJ;
+import ij.ImagePlus;
+import net.imagej.ImageJ;
+import omero.gateway.facility.TransferFacility;
+import org.scijava.Context;
+import org.scijava.convert.ConvertService;
 import ebi.idr_py.Connect;
+import omero.client;
+import net.imagej.omero.OMEROService;
+
 import omero.gateway.Gateway;
 import omero.gateway.LoginCredentials;
 import omero.gateway.SecurityContext;
@@ -17,9 +26,11 @@ import omero.gateway.exception.DSOutOfServiceException;
 import omero.gateway.facility.BrowseFacility;
 import omero.gateway.model.DatasetData;
 import omero.gateway.model.ExperimenterData;
+import omero.gateway.model.ImageData;
 import omero.gateway.model.ProjectData;
 import omero.log.Logger;
 import omero.log.SimpleLogger;
+import omero.model.Image;
 import org.scijava.ItemIO;
 import org.scijava.command.Command;
 import org.scijava.plugin.Parameter;
@@ -52,6 +63,9 @@ import java.util.concurrent.ExecutionException;
 public class idr_py implements Command {
 
 	private static SecurityContext context;
+	private static Connect connection;
+	private static ImageJ ij;
+	private static client idr_client;
 	@Parameter(label = "What is your name?")
 	private String name = "J. Doe";
 
@@ -67,9 +81,47 @@ public class idr_py implements Command {
 	public void run() {
 //		Debug entry point
 		try {
-			IDR_projects = list_all_experiments(context, gateway);
-			List<String> annoations = Attributes.annotation_ids_by_field(context, gateway);
-				System.out.println(annoations);
+			Context context = ij.getContext();
+        	OMEROService dos = context.service(OMEROService.class);
+			Dataset image = dos.downloadImage(idr_client, 2966725L);
+			ij.ui().show(image);
+//			connection.getDatasetImages(2966725L);
+//			idr_client.get
+//			IDR_projects = list_all_experiments(context, gateway);
+//
+//			String value = "CMPO_0000077";
+//			String key = "Phenotype Term Accession";
+//			String ns = "openmicroscopy.org/mapr/phenotype";
+//
+//			List<Long> annotations = Attributes.annotation_ids_by_field(context, gateway,value,key,ns);
+//				System.out.println(annotations);
+//			ImageData OME_image = Images.get_image(context, gateway, 2966725L);
+//			TransferFacility facility = gateway.getFacility(TransferFacility.class);
+//			gateway.getPixelsService()
+//			ImagePlus imp = Connect.openImagePlus(2966725L);
+//			imp.show();
+//			facility.
+//			OME_image.asImage();
+//			Collection<ImageData> images = Images.images_by_phenotype(context, gateway, value);
+//			System.out.println(images);
+//			OME_image = images.iterator().next();
+////			OME_image.
+////			ImagePlus ij_image = ij.convert().convert(OME_image.asDataset(), ImagePlus.class);
+////			ConvertService convert = new ConvertService();
+////			context = IJ.getContext();
+//			Context ij_context = ij.getContext();
+//			ConvertService convertService = ij_context.service(ConvertService.class);
+////			https://forum.image.sc/t/best-way-imagej-to-open-an-imageplus-from-omero-using-bioformats/26651/17
+//			ImagePlus ij_image = convertService.convert(OME_image.asImage(),ImagePlus.class);
+//			ij_image.show();
+
+//			convertService = context.service(ConvertService.class)
+//			connection.openImagePlus(image);
+//			Image imageimage = image.asImage();
+//			IJ.createImage(imageimage);
+
+
+//			image.get
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -96,30 +148,37 @@ public class idr_py implements Command {
 	 */
 	public static void main(final String... args) {
 		// Launch ImageJ as usual.
-		final ImageJ ij = new ImageJ();
+		 ij = new ImageJ();
 //		ij.launch(args);
 		try {
-//			Connect connection = new Connect();
-//			gateway = connection.getGateway();
-//			context = connection.getContext();
-			context = connect();
+			connection = new Connect(ij);
+			gateway = connection.getGateway();
+			context = connection.getContext();
+			idr_client = connection.getClient();
+//			ClientConnect clientConnection = new ClientConnect(ij);
+
+
+//			context = connect();
 			new idr_py().run();
-		} catch (Exception ignored) {
+		} catch (Exception e) {
+			System.out.println(e);
+			System.out.println("Connection failed");
 		}
 	}
 
 
-	public static SecurityContext connect() throws DSOutOfServiceException {
-		System.out.println("Attempting to connect to IDR ... ");
-		LoginCredentials cred = new LoginCredentials(username, password, host, port);
-		Logger simpleLogger = new SimpleLogger();
-		gateway = new Gateway(simpleLogger);
-		ExperimenterData user = gateway.connect(cred);
-		System.out.println("Connected to IDR");
-		return new SecurityContext(user.getGroupId());
-		}
+//	public static SecurityContext connect() throws DSOutOfServiceException {
+//		System.out.println("Attempting to connect to IDR ... ");
+//		LoginCredentials cred = new LoginCredentials(username, password, host, port);
+//		Logger simpleLogger = new SimpleLogger();
+//		gateway = new Gateway(simpleLogger);
+//		ExperimenterData user = gateway.connect(cred);
+//		System.out.println("Connected to IDR");
+//		return new SecurityContext(user.getGroupId());
+//		}
 
-	public static Map<String, Long> list_all_experiments(SecurityContext context,Gateway gateway) throws ExecutionException, DSAccessException, DSOutOfServiceException {
+	public static Map<String, Long> list_all_experiments(SecurityContext context,Gateway gateway)
+			throws ExecutionException, DSAccessException, DSOutOfServiceException {
 		BrowseFacility browse = gateway.getFacility(BrowseFacility.class);
 //			ImageData image = browse.getImage(ctx, imageId);
 		Collection<ProjectData> projects = browse.getProjects(context);
@@ -148,6 +207,8 @@ public class idr_py implements Command {
 //				// dataset.getImages();
 //			}
 		}
+
 	}
+
 //
 
