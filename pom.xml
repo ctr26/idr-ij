@@ -87,7 +87,11 @@
 <!--			<artifactId>omero-client</artifactId>-->
 <!--			<version>5.3.0-ice36</version>-->
 <!--		</dependency>-->
-
+		<dependency>
+			<groupId>net.imglib2</groupId>
+			<artifactId>imglib2</artifactId>
+			<version>5.3.0</version>
+		</dependency>
 		<dependency>
 			<groupId>net.imagej</groupId>
 			<artifactId>imagej</artifactId>
@@ -95,27 +99,50 @@
 		<dependency>
 			<groupId>org.openmicroscopy</groupId>
 			<artifactId>omero-gateway</artifactId>
-			<version>5.5.0</version>
+			<version>5.6.2</version>
 		</dependency>
 <!--		<dependency>-->
 <!--			<groupId>org.openmicroscopy</groupId>-->
-<!--			<artifactId>omero</artifactId>-->
+<!--			<artifactId>omero-api</artifactId>-->
 <!--			<version>5.3.3</version>-->
 <!--		</dependency>-->
+		<dependency>
+			<groupId>omero</groupId>
+			<artifactId>blitz</artifactId>
+<!--			<version>${omero.version}</version>-->
+		</dependency>
 <!--		<dependency>-->
 <!--			<groupId>org.openmicroscopy</groupId>-->
 <!--			<artifactId>omero-insight</artifactId>-->
 <!--		</dependency>-->
+		<!-- https://mvnrepository.com/artifact/loci/loci_plugins -->
+		<dependency>
+			<groupId>loci</groupId>
+			<artifactId>loci_plugins</artifactId>
+			<version>4.4.12</version>
+		</dependency>
+		<dependency>
+			<groupId>net.imagej</groupId>
+			<artifactId>imagej-omero</artifactId>
+			<version>0.7.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-log4j12</artifactId>
+			<version>1.7.2</version>
+			<scope>test</scope>
+		</dependency>
+
 	</dependencies>
 
-	<repositories>
-		<repository>
-			<id>scijava.public</id>
-			<url>https://maven.scijava.org/content/groups/public</url>
-		</repository>
+			<repositories>
 				<repository>
-					<id>ome.maven</id>
-					<url>http://artifacts.openmicroscopy.org/artifactory/maven/</url>
+					<id>scijava.public</id>
+					<url>https://maven.scijava.org/content/groups/public</url>
 				</repository>
-	</repositories>
-</project>
+						<repository>
+							<id>ome.maven</id>
+							<url>http://artifacts.openmicroscopy.org/artifactory/maven/</url>
+						</repository>
+			</repositories>
+            </project>
