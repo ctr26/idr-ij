@@ -25,9 +25,7 @@ import org.scijava.command.Command;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 
 /**
@@ -63,12 +61,15 @@ public class idr_py implements Command {
 	public static final String password = "public";
 	public static final String host = "idr.openmicroscopy.org";
 	public static final int port = 0;
+	public Map<String, Long> IDR_projects;
 
 	@Override
 	public void run() {
 //		Debug entry point
 		try {
-			list_all_experiments(context, gateway);
+			IDR_projects = list_all_experiments(context, gateway);
+			List<String> annoations = Attributes.annotation_ids_by_field(context, gateway);
+				System.out.println(annoations);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -98,26 +99,27 @@ public class idr_py implements Command {
 		final ImageJ ij = new ImageJ();
 //		ij.launch(args);
 		try {
-			Connect connection = new Connect();
-			gateway = connection.getGateway();
-			context = connection.getContext();
+//			Connect connection = new Connect();
+//			gateway = connection.getGateway();
+//			context = connection.getContext();
+			context = connect();
 			new idr_py().run();
 		} catch (Exception ignored) {
 		}
 	}
 
 
-//	public static SecurityContext connect() throws DSOutOfServiceException {
-//		System.out.println("Attempting to connect to IDR ... ");
-//		LoginCredentials cred = new LoginCredentials(username,password, host, port);
-//		Logger simpleLogger = new SimpleLogger();
-//		gateway = new Gateway(simpleLogger);
-//		ExperimenterData user = gateway.connect(cred);
-//		System.out.println("Connected to IDR");
-//		return new SecurityContext(user.getGroupId());
-//		}
+	public static SecurityContext connect() throws DSOutOfServiceException {
+		System.out.println("Attempting to connect to IDR ... ");
+		LoginCredentials cred = new LoginCredentials(username, password, host, port);
+		Logger simpleLogger = new SimpleLogger();
+		gateway = new Gateway(simpleLogger);
+		ExperimenterData user = gateway.connect(cred);
+		System.out.println("Connected to IDR");
+		return new SecurityContext(user.getGroupId());
+		}
 
-	public static void list_all_experiments(SecurityContext context,Gateway gateway) throws ExecutionException, DSAccessException, DSOutOfServiceException {
+	public static Map<String, Long> list_all_experiments(SecurityContext context,Gateway gateway) throws ExecutionException, DSAccessException, DSOutOfServiceException {
 		BrowseFacility browse = gateway.getFacility(BrowseFacility.class);
 //			ImageData image = browse.getImage(ctx, imageId);
 		Collection<ProjectData> projects = browse.getProjects(context);
@@ -127,13 +129,19 @@ public class idr_py implements Command {
 		Iterator<DatasetData> j;
 		DatasetData dataset;
 
+		Map<String, Long>IDR_projects = new HashMap<String,Long>();
+
 		while (i.hasNext()) {
 			project = i.next();
 			String name = project.getName();
 			long id = project.getId();
-			datasets = project.getDatasets();
-			System.out.println("Name: " + name + "ID: " + id);
-			j = datasets.iterator();
+			String description = project.getDescription();
+//			datasets = project.getDatasets();
+			System.out.println("Name: " + name + "ID: " + id + "Description: " + description);
+//			j = datasets.iterator();
+			IDR_projects.put(name, id);
+		}
+		return IDR_projects;
 //			while (j.hasNext()) {
 //				dataset = j.next();
 //				// Do something here
@@ -143,4 +151,3 @@ public class idr_py implements Command {
 	}
 //
 
-}

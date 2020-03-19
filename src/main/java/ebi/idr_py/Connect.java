@@ -34,4 +34,9 @@ public class Connect {
     public SecurityContext getContext(){
         return context;
     }
+
+    public SecurityContext getNewContext(){
+        context = new SecurityContext(user.getGroupId());
+        return context;
+    }
 }
