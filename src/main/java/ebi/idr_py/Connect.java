@@ -1,5 +1,13 @@
 package ebi.idr_py;
 
+import Glacier2.CannotCreateSessionException;
+import Glacier2.PermissionDeniedException;
+import ij.ImagePlus;
+import ij.IJ;
+import loci.plugins.LociImporter;
+import net.imagej.ImageJ;
+import omero.ServerError;
+import omero.client;
 import omero.gateway.Gateway;
 import omero.gateway.LoginCredentials;
 import omero.gateway.SecurityContext;
@@ -9,22 +17,35 @@ import omero.log.Logger;
 import omero.log.SimpleLogger;
 
 public class Connect {
+    public static  client idr_client;
+    public LoginCredentials cred;
+    private ImageJ ij;
     public static Gateway gateway;
-    public static final String username = "public";
-    public static final String password = "public";
-    public static final String host = "idr.openmicroscopy.org";
-    public static final int port = 0;
     public static SecurityContext context;
     private ExperimenterData user;
 
-    Connect() throws DSOutOfServiceException {
-        System.out.println("Attempting to connect to IDR ... ");
-        LoginCredentials cred = new LoginCredentials(username,password, host, port);
+    public static final String USERNAME = "public";
+    public static final String PASSWORD = "public";
+    public static final String HOST = "idr.openmicroscopy.org";
+    public static final int PORT = 0;
+    public static final int groupId = -1;
+
+    Connect(ImageJ ij) throws DSOutOfServiceException, CannotCreateSessionException, PermissionDeniedException, ServerError {
+        this.ij = ij;
+        System.out.println("Attempting to connect to IDR - Blitz ... ");
+        cred = new LoginCredentials(USERNAME,PASSWORD, HOST, PORT);
         Logger simpleLogger = new SimpleLogger();
         gateway = new Gateway(simpleLogger);
         user = gateway.connect(cred);
         context = new SecurityContext(user.getGroupId());
-        System.out.println("Connected to IDR");
+        System.out.println("Connected to IDR - Blitz");
+
+        System.out.println("Attempting to connect to IDR - Client... ");
+
+        idr_client = new client(HOST);
+        idr_client.createSession(USERNAME,PASSWORD);
+
+        System.out.println("Connected to IDR - Client... ");
     }
 
     public Gateway getGateway() {
@@ -35,8 +56,100 @@ public class Connect {
         return context;
     }
 
+    public client getClient(){
+        return idr_client;
+    }
+
+
     public SecurityContext getNewContext(){
         context = new SecurityContext(user.getGroupId());
         return context;
     }
+
+    public static ImagePlus openImagePlus(long imageId)
+            throws Exception
+    {
+        StringBuffer buffer = new StringBuffer();
+        buffer.append("location=[OMERO] open=[omero:server=");
+        buffer.append(HOST);
+        buffer.append("\nuser=");
+        buffer.append(USERNAME);
+        buffer.append("\nport=");
+        buffer.append(PORT);
+        buffer.append("\npass=");
+        buffer.append(PASSWORD);
+        buffer.append("\ngroupID=");
+        buffer.append(groupId);
+        buffer.append("\niid=");
+        buffer.append(imageId);
+        buffer.append("]");
+        buffer.append(" windowless=true ");
+        LociImporter importer = new LociImporter();
+        importer.run(buffer.toString());
+//        IJ.runPlugIn("loci.plugins.LociImporter", buffer.toString());
+        return IJ.getImage();
+//        new LociImporter().run(buffer.toString());
+//        IJ.runPlugIn("loci.plugins.LociImporter", buffer.toString());
+    }
+
+//    void convertImagePlus(Image OmeroImage){
+//        ConvertService.convert(OmeroImage, ImagePlus.class);
+////    }
+//public void getDatasetImages(Long imageId) {
+//    Gateway gateway = null;
+//    try {
+////        LoginCredentials credentials = new LoginCredentials(USERNAME,PASSWORD,HOST,PORT);
+////        SimpleLogger simpleLogger = new SimpleLogger();
+////        gateway = new Gateway(simpleLogger);
+////        gateway.connect(credentials);
+////        ExperimenterData ed = gateway.getLoggedInUser();
+////        List<GroupData> grda= ed.getGroups();
+//
+//        //This is the way to get via browsefacility, can be opened with
+//        //*
+////        BrowseFacility browser = gateway.getFacility(BrowseFacility.class);
+////        Iterator<GroupData> gidit=grda.iterator();
+////        int counter =0;
+////        ImageData id =null;
+//
+////        IJ.log("ngroups " + grda.size());
+////        while (gidit.hasNext() && id==null){
+////            try {
+////                SecurityContext ctx = new SecurityContext(grda.get(counter).getGroupId());
+////                id = browser.getImage(ctx, imageId);
+////                cred.setGroupID(ctx.getGroupID());
+////                gateway.connect(cred);
+////            } catch (Exception e){
+////                //IJ.showMessage("Image not found in group " +grda.get(counter).getGroupId());
+////            }
+////            counter++;
+////        }
+////        if (id==null) {
+////            ij.IJ.showMessage("Image not found");
+////            return;
+////        }
+////        ImageJ ij = new ImageJ();
+//        Context context = ij.getContext();
+//        OMEROService dos = context.service(OMEROService.class);
+//        OMEROLocation ol = new OMEROLocation(HOST,PORT,USERNAME,PASSWORD);
+//        OMEROSession os = dos.createSession(ol);
+//        client cl = os.getClient();
+//        Dataset d = dos.downloadImage(cl,imageId);
+//        ImgPlus<? extends RealType<?>> implu = d.getImgPlus();
+//        ImagePlus imp = ij.convert().convert(implu, ImagePlus.class);
+////        ImagePlus imp = ImageJFunctions.wrap(implu,"My desired imageplus");
+//        imp.show();
+//    } catch (Exception e) {
+//        e.printStackTrace();
+////        IJ.log(e.getMessage());
+////        StackTraceElement[] t = e.getStackTrace();
+////        for (int i=0;i<t.length;i++){
+////            IJ.log(t[i].toString());
+////        }
+////        IJ.showMessage("An error occurred while loading the image.");
+////        System.out.println("An error occurred while loading the image.");
+//    } finally {
+//        if (gateway != null) gateway.disconnect();
+//    }
+//}
 }
