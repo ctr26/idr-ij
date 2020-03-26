@@ -4,7 +4,12 @@ import Glacier2.CannotCreateSessionException;
 import Glacier2.PermissionDeniedException;
 import ij.ImagePlus;
 import ij.IJ;
+import kong.unirest.GetRequest;
+import kong.unirest.HttpResponse;
+import kong.unirest.JsonNode;
+import kong.unirest.Unirest;
 import loci.plugins.LociImporter;
+import net.dongliu.requests.Requests;
 import net.imagej.ImageJ;
 import omero.ServerError;
 import omero.client;
@@ -15,6 +20,11 @@ import omero.gateway.exception.DSOutOfServiceException;
 import omero.gateway.model.ExperimenterData;
 import omero.log.Logger;
 import omero.log.SimpleLogger;
+import net.dongliu.requests.*;
+
+import java.io.IOException;
+import java.net.URL;
+import java.net.URLConnection;
 
 public class Connect {
     public static  client idr_client;
@@ -65,6 +75,65 @@ public class Connect {
         context = new SecurityContext(user.getGroupId());
         return context;
     }
+
+    public static URLConnection getGson() throws IOException {
+        String idr_base_url = "https://idr.openmicroscopy.org";
+        String index_page = idr_base_url.concat("/webclient/?experimenter=-1");
+
+        URL url = new URL(index_page);
+        URLConnection request = url.openConnection();
+        request.connect();
+        return request;
+    }
+
+
+    public static  void getSession(){
+        String idr_base_url = "https://idr.openmicroscopy.org";
+        String index_page = idr_base_url.concat("/webclient/?experimenter=-1");
+//        Requests request = new Requests();
+        Session session = Requests.session();
+        RequestBuilder request = session.get(index_page);
+        String response = request.send().readToText();
+        System.out.println(response);
+
+    }
+    public static Unirest getJSONSession() throws Exception {
+        String idr_base_url = "https://idr.openmicroscopy.org";
+        String index_page = idr_base_url.concat("/webclient/?experimenter=-1");
+
+        Unirest session = new Unirest();
+
+        GetRequest request = Unirest.get(index_page)
+                .header("accept", "application/json");
+//                .queryString("apiKey", "123")
+//                .field("parameter", "value")
+//                .field("firstname", "Gary")
+        HttpResponse<JsonNode> response = request.asJson();
+        if(response.getStatus()!=200){
+            throw new Exception("Json failed");
+        } else {
+            System.out.println("JSON succeeded");
+        }
+//        session.queryString();
+//        System.out.println(response.getBody());
+        return session;
+    }
+//    public create_http_session(idr_base_url='https://idr.openmicroscopy.org'):
+//
+//            """
+//    Create and return http session
+//    """
+//    index_page = "%s/webclient/?experimenter=-1" % idr_base_url
+//
+//    # create http session
+//    with requests.Session() as session:
+//    request = requests.Request('GET', index_page)
+//    prepped = session.prepare_request(request)
+//    response = session.send(prepped)
+//            if response.status_code != 200:
+//            response.raise_for_status()
+//
+//            return session
 
     public static ImagePlus openImagePlus(long imageId)
             throws Exception

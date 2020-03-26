@@ -81,20 +81,34 @@ public class idr_py implements Command {
 	public void run() {
 //		Debug entry point
 		try {
-			Context context = ij.getContext();
-        	OMEROService dos = context.service(OMEROService.class);
-			Dataset image = dos.downloadImage(idr_client, 2966725L);
-			ij.ui().show(image);
+			Unirest session = Connect.getJSONSession();
+
+
+//			IDR_projects = list_all_experiments(context, gateway);
+//			Dataset ij_image = Images.get_ij_dataset(ij, idr_client, 8343617L);
+//			ij.ui().show(ij_image);
+
+
+//			Context context = ij.getContext();
+//        	OMEROService dos = context.service(OMEROService.class);
+//			Dataset image = dos.downloadImage(idr_client, 2966725L);
+//			ImageData image = Images.get_image(context, gateway, 2966725L);
+//			ij.ui().show(image);
+//			Dataset ij_image_dataset = image.asDataset();
+//			ij.ui().show(ij_image);
+
+
 //			connection.getDatasetImages(2966725L);
 //			idr_client.get
-//			IDR_projects = list_all_experiments(context, gateway);
 //
-//			String value = "CMPO_0000077";
-//			String key = "Phenotype Term Accession";
-//			String ns = "openmicroscopy.org/mapr/phenotype";
+			String value = "CMPO_0000077";
+			String key = "Phenotype Term Accession";
+			String ns = "openmicroscopy.org/mapr/phenotype";
 //
-//			List<Long> annotations = Attributes.annotation_ids_by_field(context, gateway,value,key,ns);
-//				System.out.println(annotations);
+			List<Long> annotations = Attributes.annotation_ids_by_field(context, gateway,value,key,ns);
+//			System.out.println(annotations);
+
+
 //			ImageData OME_image = Images.get_image(context, gateway, 2966725L);
 //			TransferFacility facility = gateway.getFacility(TransferFacility.class);
 //			gateway.getPixelsService()
