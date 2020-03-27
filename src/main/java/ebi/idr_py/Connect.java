@@ -44,13 +44,9 @@ public class Connect {
         this.ij = ij;
         System.out.println("Attempting to connect to IDR - Blitz ... ");
         cred = new LoginCredentials(USERNAME,PASSWORD, HOST, PORT);
-        System.out.println("a");
         Logger simpleLogger = new SimpleLogger();
-        System.out.println("b");
         gateway = new Gateway(simpleLogger);
-        System.out.println("c");
         user = gateway.connect(cred);
-        System.out.println("d");
         context = new SecurityContext(user.getGroupId());
         System.out.println("Connected to IDR - Blitz");
 

@@ -182,7 +182,7 @@ public class idr_py implements Command {
 
 
 //			context = connect();
-//			new GUI();
+//			new GUI(connection);
 			new idr_py().run();
 
 

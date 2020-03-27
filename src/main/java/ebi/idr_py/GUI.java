@@ -10,6 +10,10 @@ public class GUI {
     private JPanel oneImage;
     private JSpinner oneImageLong;
 
+    public GUI(Connect connection) {
+
+    }
+
     private void createUIComponents() {
         // TODO: place custom component creation code here
     }
