@@ -6,10 +6,6 @@ import java.awt.event.WindowEvent;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionListener;
-import java.text.NumberFormat;
-import java.util.List;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 
 public class GUI extends javax.swing.JFrame {
     private Connect connection;
@@ -17,9 +13,15 @@ public class GUI extends javax.swing.JFrame {
     private JList imageList;
     private JButton openImages;
     private JButton populateList;
-    private JPanel oneImage;
-    private JSpinner oneImageLong;
+    private JPanel oneImageTab;
+    private JSpinner oneImageLongField;
     private JPanel masterPanel;
+    private JButton quickOpenButton;
+    private JPanel byGenesTab;
+    private JPanel downloadTab;
+    private JFormattedTextField formattedTextField1;
+    private JButton downloadButton;
+    private JButton browseDownloadButton;
     private Long ongImageLongValue;
 
     public GUI(Connect connection) {
@@ -52,20 +54,17 @@ public class GUI extends javax.swing.JFrame {
         this.setContentPane(masterPanel);
         this.setLocationRelativeTo(null); //Centering
         this.setResizable(false);
-        this.pack();
         this.setVisible(true);
         this.pack();
-
-
     }
 
     public void guiSettingsChange(java.awt.event.ActionEvent e){
         try {
-            oneImageLong.commitEdit();
+            oneImageLongField.commitEdit();
         } catch ( java.text.ParseException ex ) {
             ex.printStackTrace();
         }
-        this.ongImageLongValue = (Long) oneImageLong.getValue();
+        this.ongImageLongValue = (Long) oneImageLongField.getValue();
 
         this.revalidate();
     }
