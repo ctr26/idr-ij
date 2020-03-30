@@ -6,11 +6,14 @@
  *     https://unlicense.org/
  */
 package ebi.idr_py;
+import Glacier2.CannotCreateSessionException;
+import Glacier2.PermissionDeniedException;
 import net.imagej.Dataset;
 import net.imagej.ImageJ;
 import ij.IJ;
 import ij.ImagePlus;
 import net.imagej.ImageJ;
+import omero.ServerError;
 import omero.gateway.facility.TransferFacility;
 import org.scijava.Context;
 import org.scijava.convert.ConvertService;
@@ -81,12 +84,12 @@ public class idr_py implements Command {
 	public void run() {
 //		Debug entry point
 		try {
-			Unirest session = Connect.getJSONSession();
+//			Unirest session = Connect.getJSONSession();
 
 
 //			IDR_projects = list_all_experiments(context, gateway);
-//			Dataset ij_image = Images.get_ij_dataset(ij, idr_client, 8343617L);
-//			ij.ui().show(ij_image);
+			Dataset ij_image = Images.get_ij_dataset(ij, idr_client, 8343617L);
+			ij.ui().show(ij_image);
 
 
 //			Context context = ij.getContext();
@@ -164,20 +167,25 @@ public class idr_py implements Command {
 		// Launch ImageJ as usual.
 		 ij = new ImageJ();
 //		ij.launch(args);
+
 		try {
 			connection = new Connect(ij);
 			gateway = connection.getGateway();
 			context = connection.getContext();
 			idr_client = connection.getClient();
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.out.println("Connection failed");
+		}
+
 //			ClientConnect clientConnection = new ClientConnect(ij);
 
 
 //			context = connect();
+			new GUI(connection);
 			new idr_py().run();
-		} catch (Exception e) {
-			System.out.println(e);
-			System.out.println("Connection failed");
-		}
+
+
 	}
 
 

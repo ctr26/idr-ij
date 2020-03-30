@@ -76,6 +76,10 @@ public class Connect {
         return context;
     }
 
+    public void closeConnection() throws Exception {
+        gateway.close();
+    }
+
     public static URLConnection getGson() throws IOException {
         String idr_base_url = "https://idr.openmicroscopy.org";
         String index_page = idr_base_url.concat("/webclient/?experimenter=-1");
