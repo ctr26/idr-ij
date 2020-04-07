@@ -15,13 +15,18 @@ import org.scijava.Context;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 
 public class Images {
     private static String value = "CMPO_0000077";
     private static String key="Phenotype Term Accession";
     private static String ns="openmicroscopy.org/mapr/phenotype";
     private static Long image_id = 2966725L;
+
+    private static String phenotype = "CMPO_0000077";
+
 
     public static Collection<ImageData> images_by_phenotype(SecurityContext context, Gateway gateway, String phenotype) throws ExecutionException, DSAccessException, DSOutOfServiceException {
         Collection<Long> ann_ids = Attributes.annotation_ids_by_field(context, gateway, phenotype, key, ns);
@@ -39,5 +44,20 @@ public class Images {
         OMEROService dos = context.service(OMEROService.class);
         return dos.downloadImage(idr_client, ImageID);
     }
+
+    public static List<String> list_of_images_by_phenotype(SecurityContext context, Gateway gateway, String phenotype) {
+        List<Long> annotations = Attributes.annotation_ids_by_field(context, gateway,value,key,ns);
+        return annotations.stream()
+                .map(s->String.valueOf(s))
+                .collect(Collectors.toList());
+    }
+
+
+//            """
+//    Passes phenotype as the value argument to annotation_ids_by_field
+//    and loads Image objects which can be used for loading thumbnails, etc.
+//    """
+//    ann_ids = annotation_ids_by_field(conn, phenotype)
+//    return list(conn.getObjectsByAnnotations("Image", ann_ids))
 
 }

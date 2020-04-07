@@ -41,6 +41,7 @@ import org.scijava.plugin.Plugin;
 
 import java.util.*;
 import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 
 /**
  * A very simple plugin.
@@ -69,6 +70,7 @@ public class idr_py implements Command {
 	private static Connect connection;
 	private static ImageJ ij;
 	private static client idr_client;
+	private static GUI gui;
 	@Parameter(label = "What is your name?")
 	private String name = "J. Doe";
 
@@ -88,8 +90,8 @@ public class idr_py implements Command {
 
 
 //			IDR_projects = list_all_experiments(context, gateway);
-			Dataset ij_image = Images.get_ij_dataset(ij, idr_client, 8343617L);
-			ij.ui().show(ij_image);
+//			Dataset ij_image = Images.get_ij_dataset(ij, idr_client, 8343617L);
+//			ij.ui().show(ij_image);
 
 
 //			Context context = ij.getContext();
@@ -109,7 +111,11 @@ public class idr_py implements Command {
 			String ns = "openmicroscopy.org/mapr/phenotype";
 //
 			List<Long> annotations = Attributes.annotation_ids_by_field(context, gateway,value,key,ns);
-//			System.out.println(annotations);
+			
+			List<String> annotationsString = Images.list_of_images_by_phenotype(context, gateway,value);
+			System.out.println("Found images with IDS:\n".concat(annotations.toString()));
+			gui.populateList(annotationsString);
+
 
 
 //			ImageData OME_image = Images.get_image(context, gateway, 2966725L);
@@ -182,7 +188,7 @@ public class idr_py implements Command {
 
 
 //			context = connect();
-			new GUI(connection);
+			gui = new GUI(connection,gateway,context,ij,idr_client);
 			new idr_py().run();
 
 
