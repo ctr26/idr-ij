@@ -35,18 +35,21 @@ public class GUI extends javax.swing.JFrame {
     private JButton quickOpenButton;
     private JPanel byGenesTab;
     private JPanel downloadTab;
-    private JFormattedTextField formattedTextField1;
+    private JFormattedTextField downloadLocation;
     private JButton downloadButton;
     private JButton browseDownloadButton;
     private JPanel listPanel;
     private JPanel buttonsPanel;
-    private JTextField textField1;
+    private JTextField geneotypeField;
     private JProgressBar progressBar1;
-    private JTextField textField2;
+    private JTextField phenotypeField;
+    private JButton populateListGenotype;
+    private JButton populateListPhenotype;
 
     private Long ongImageLongValue;
     private Gateway gateway;
     private ImageJ ij;
+    private String genotypeText;
 
     public GUI(Connect connection, Gateway gateway, SecurityContext context, ImageJ ij, client idr_client) {
         this.connection = connection;
@@ -125,6 +128,8 @@ public class GUI extends javax.swing.JFrame {
             ex.printStackTrace();
         }
         this.ongImageLongValue = Long.valueOf((Integer)oneImageLongField.getValue());
+        this.genotypeText = geneotypeField.getText();
+
         System.out.println(ongImageLongValue);
         this.revalidate();
     }
