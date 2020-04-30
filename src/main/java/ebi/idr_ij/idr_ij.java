@@ -5,43 +5,26 @@
  * See the Unlicense for details:
  *     https://unlicense.org/
  */
-package ebi.idr_py;
-import Glacier2.CannotCreateSessionException;
-import Glacier2.PermissionDeniedException;
-import net.imagej.Dataset;
+package ebi.idr_ij;
 import net.imagej.ImageJ;
-import ij.IJ;
-import ij.ImagePlus;
-import net.imagej.ImageJ;
-import omero.ServerError;
-import omero.gateway.facility.TransferFacility;
-import org.scijava.Context;
-import org.scijava.convert.ConvertService;
-import ebi.idr_py.Connect;
-import omero.client;
-import net.imagej.omero.OMEROService;
+import omero.*;
+import org.json.JSONObject;
 
 import omero.gateway.Gateway;
-import omero.gateway.LoginCredentials;
 import omero.gateway.SecurityContext;
 import omero.gateway.exception.DSAccessException;
 import omero.gateway.exception.DSOutOfServiceException;
 import omero.gateway.facility.BrowseFacility;
 import omero.gateway.model.DatasetData;
-import omero.gateway.model.ExperimenterData;
-import omero.gateway.model.ImageData;
 import omero.gateway.model.ProjectData;
-import omero.log.Logger;
-import omero.log.SimpleLogger;
-import omero.model.Image;
 import org.scijava.ItemIO;
 import org.scijava.command.Command;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 
+import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
-import java.util.stream.Collectors;
 
 /**
  * A very simple plugin.
@@ -64,13 +47,14 @@ import java.util.stream.Collectors;
  * @author Curtis Rueden
  */
 @Plugin(type = Command.class, headless = true, menuPath = "Plugins>EBI>IDR")
-public class idr_py implements Command {
+public class idr_ij implements Command {
 
 	private static SecurityContext context;
 	private static Connect connection;
 	private static ImageJ ij;
 	private static client idr_client;
 	private static GUI gui;
+	private static IDR_API idr_api;
 	@Parameter(label = "What is your name?")
 	private String name = "J. Doe";
 
@@ -86,6 +70,8 @@ public class idr_py implements Command {
 	public void run() {
 //		Debug entry point
 		try {
+			JSONObject screens = idr_api.JSONObjectScreenWithGene("CDC20");
+			System.out.println(screens.toString());
 //			Unirest session = Connect.getJSONSession();
 
 
@@ -111,13 +97,13 @@ public class idr_py implements Command {
 			String ns = "openmicroscopy.org/mapr/phenotype";
 //
 			List<Long> annotations = Attributes.annotation_ids_by_field(context, gateway,value,key,ns);
-			
+
 			List<String> annotationsString = Images.list_of_images_by_phenotype(context, gateway,value);
 			System.out.println("Found images with IDS:\n".concat(annotations.toString()));
-			gui.populateList(annotationsString);
+//			gui.populateList(annotationsString);
 
-
-
+			List<Long> aa = Connect.getImageIDsByAnnotation(annotations.get(0));
+			System.out.println(aa.toString());
 //			ImageData OME_image = Images.get_image(context, gateway, 2966725L);
 //			TransferFacility facility = gateway.getFacility(TransferFacility.class);
 //			gateway.getPixelsService()
@@ -169,11 +155,11 @@ public class idr_py implements Command {
 	 *
 	 * @param args unused
 	 */
+
 	public static void main(final String... args) {
 		// Launch ImageJ as usual.
 		 ij = new ImageJ();
 //		ij.launch(args);
-
 		try {
 			connection = new Connect(ij);
 			gateway = connection.getGateway();
@@ -183,15 +169,17 @@ public class idr_py implements Command {
 			e.printStackTrace();
 			System.out.println("Connection failed");
 		}
+		try {
+			idr_api = new IDR_API();
+		} catch (IOException e) {
+			e.printStackTrace();
+			System.out.println("API connection failed");
+		}
 
 //			ClientConnect clientConnection = new ClientConnect(ij);
-
-
 //			context = connect();
 			gui = new GUI(connection,gateway,context,ij,idr_client);
-			new idr_py().run();
-
-
+			new idr_ij().run();
 	}
 
 

@@ -1,15 +1,10 @@
-package ebi.idr_py;
+package ebi.idr_ij;
 
-import omero.ApiUsageException;
-import omero.RArray;
 import omero.RType;
-import omero.api.IQueryPrx;
 import omero.rtypes;
-import omero.rtypes.Conversion;
 import omero.gateway.Gateway;
 import omero.gateway.SecurityContext;
 import omero.sys.ParametersI;
-import omero.util.IceMapper;
 
 import java.util.List;
 import java.util.Map;
@@ -46,9 +41,10 @@ public class Attributes {
             params.add("ns", rtypes.wrap(ns));
         String q = ("select a.id from MapAnnotation a join a.mapValue as mv where a.ns = :ns and mv.name = :key and mv.value = :value");
 //            System.out.println(gateway.getQueryService(context).projection(q, params));
-            List<RType> projections = gateway.getQueryService(context).projection(q, params).get(0);
-//            System.out.println(projections);
-            return projections.stream().map((n) -> (Long) rtypes.unwrap(n)).collect(Collectors.toList());
+//            List<RType> projections = gateway.getQueryService(context).projection(q, params).get(0);
+            List<List<RType>> projections = gateway.getQueryService(context).projection(q, params);
+            System.out.println(projections.size());
+            return projections.stream().map((n) -> (Long) rtypes.unwrap(n.get(0))).collect(Collectors.toList());
         } catch (Exception e) {
             e.printStackTrace();
         }

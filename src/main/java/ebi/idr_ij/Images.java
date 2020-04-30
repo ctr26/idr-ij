@@ -1,4 +1,4 @@
-package ebi.idr_py;
+package ebi.idr_ij;
 
 import net.imagej.Dataset;
 import net.imagej.ImageJ;
@@ -39,14 +39,18 @@ public class Images {
         return browse.getImage(context,image_id);
     }
 
-    public static Dataset get_ij_dataset(ImageJ ij, client idr_client, Long ImageID) throws IOException, ServerError {
+    public static Dataset get_ij_dataset(ImageJ ij, client idr_client, Long ImageID) throws IOException,
+            ServerError {
         Context context = ij.getContext();
         OMEROService dos = context.service(OMEROService.class);
         return dos.downloadImage(idr_client, ImageID);
     }
 
     public static List<String> list_of_images_by_phenotype(SecurityContext context, Gateway gateway, String phenotype) {
-        List<Long> annotations = Attributes.annotation_ids_by_field(context, gateway,value,key,ns);
+        String key="Phenotype Term Accession";
+        String ns="openmicroscopy.org/mapr/phenotype";
+
+        List<Long> annotations = Attributes.annotation_ids_by_field(context, gateway,phenotype,key,ns);
         return annotations.stream()
                 .map(s->String.valueOf(s))
                 .collect(Collectors.toList());

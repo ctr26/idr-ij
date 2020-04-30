@@ -1,13 +1,11 @@
-package ebi.idr_py;
+package ebi.idr_ij;
 
 import Glacier2.CannotCreateSessionException;
 import Glacier2.PermissionDeniedException;
 import net.imagej.Dataset;
 import net.imagej.ImageJ;
-import net.imagej.omero.OMEROSession;
 import omero.ServerError;
 import omero.client;
-import net.imagej.omero.OMEROLocation;
 import net.imagej.omero.DefaultOMEROService;
 import omero.gateway.Gateway;
 import omero.gateway.SecurityContext;
@@ -31,7 +29,8 @@ public class ClientConnect {
     public DefaultOMEROService Omero_service;
     public client idr_client;
 
-    ClientConnect(ImageJ IJ) throws DSOutOfServiceException, CannotCreateSessionException, PermissionDeniedException, ServerError, URISyntaxException {
+    ClientConnect(ImageJ IJ) throws DSOutOfServiceException, CannotCreateSessionException,
+            PermissionDeniedException, ServerError, URISyntaxException {
         this.IJ = IJ;
         System.out.println("Attempting to connect to IDR ... ");
         idr_client = new client(HOST);

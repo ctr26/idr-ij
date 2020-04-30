@@ -1,4 +1,4 @@
-package ebi.idr_py;
+package ebi.idr_ij;
 //import javax.swing.*;
 import net.imagej.Dataset;
 import net.imagej.ImageJ;
@@ -6,8 +6,6 @@ import omero.ServerError;
 import omero.client;
 import omero.gateway.Gateway;
 import omero.gateway.SecurityContext;
-import omero.gateway.exception.DSAccessException;
-import omero.gateway.exception.DSOutOfServiceException;
 
 import java.awt.event.*;
 import javax.swing.*;
@@ -15,9 +13,10 @@ import java.awt.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintStream;
 import java.util.List;
 import java.util.Vector;
-import java.util.concurrent.ExecutionException;
 
 public class GUI extends javax.swing.JFrame {
     private client idr_client;
@@ -43,13 +42,15 @@ public class GUI extends javax.swing.JFrame {
     private JTextField geneotypeField;
     private JProgressBar progressBar1;
     private JTextField phenotypeField;
-    private JButton populateListGenotype;
+    private JButton populateListGenotypeButton;
     private JButton populateListPhenotype;
+    private JScrollPane debugGUI;
 
     private Long ongImageLongValue;
     private Gateway gateway;
     private ImageJ ij;
     private String genotypeText;
+    private Vector<String> vct;
 
     public GUI(Connect connection, Gateway gateway, SecurityContext context, ImageJ ij, client idr_client) {
         this.connection = connection;
@@ -60,9 +61,20 @@ public class GUI extends javax.swing.JFrame {
 
         initWindowComponents();
         initGUIComponents();
+        initErrToDebugWindow();
         initListeners();
 //        images = new Images();
 //        attributes = new Attributes();
+    }
+
+    private void initErrToDebugWindow() {
+        JTextArea display = new JTextArea(16, 58);
+        display.setEditable(false); // set textArea non-editable
+        GuiOutputStream rawout = new GuiOutputStream(display);
+        debugGUI.getViewport().setView(display);
+        debugGUI.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+        // Set new stream for System.out
+        System.setOut(new PrintStream(rawout, true));
     }
 
     private void initListeners() {
@@ -76,7 +88,7 @@ public class GUI extends javax.swing.JFrame {
 
         oneImageLongField.addPropertyChangeListener(settingsListener);
 
-        ActionListener buttonListener = new ActionListener() {
+        quickOpenButton.addActionListener(new ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent e) {
                 guiSettingsChange(null);
                 try {
@@ -87,9 +99,44 @@ public class GUI extends javax.swing.JFrame {
                     ex.printStackTrace();
                 }
             }
-        };
+        });
 
-        quickOpenButton.addActionListener(buttonListener);
+        populateListGenotypeButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+            }
+        });
+
+        populateListPhenotype.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+//                String value = "CMPO_0000077";
+//                String key = "Phenotype Term Accession";
+//                String ns = "openmicroscopy.org/mapr/phenotype";
+//                List<Long> annotations = Attributes.annotation_ids_by_field(context, gateway,value,key,ns);
+                System.out.println("From phentotype: ".concat(phenotypeField.getText()));
+                List<String> annotationsString = Images.list_of_images_by_phenotype(context, gateway,
+                                                                                    phenotypeField.getText());
+                System.out.println("Found images with IDS:\n".concat(String.join(",", annotationsString)));
+                populateList(annotationsString);
+            }
+        });
+
+        openImages.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                for (String current_id_string : vct) {
+                    try {
+//                        int current_id_int = Integer.parseInt(current_id_string);
+                        Long current_id_long = Long.parseLong(current_id_string);
+                        Dataset ij_image = Images.get_ij_dataset(ij, idr_client, current_id_long);
+                        ij.ui().show(ij_image);
+                    } catch (IOException | ServerError ex) {
+                        ex.printStackTrace();
+                    }
+                }
+            }
+        });
     }
 
     private void initWindowComponents() {
@@ -135,8 +182,22 @@ public class GUI extends javax.swing.JFrame {
     }
 
     public void populateList(List<String> annotationsString) {
-        Vector<String> vct = new Vector<String>();
+         vct = new Vector<String>();
         vct.addAll(annotationsString);
         imageList.setListData(vct);
     }
+
+    private class GuiOutputStream extends OutputStream {
+        JTextArea textArea;
+
+        public GuiOutputStream(JTextArea textArea) {
+            this.textArea = textArea;
+        }
+
+        @Override
+        public void write(int data) throws IOException {
+            textArea.append(new String(new byte[] { (byte) data }));
+        }
+    }
+
 }

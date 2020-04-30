@@ -1,4 +1,4 @@
-package ebi.idr_py;
+package ebi.idr_ij;
 
 import Glacier2.CannotCreateSessionException;
 import Glacier2.PermissionDeniedException;
@@ -11,8 +11,8 @@ import kong.unirest.Unirest;
 import loci.plugins.LociImporter;
 import net.dongliu.requests.Requests;
 import net.imagej.ImageJ;
-import omero.ServerError;
-import omero.client;
+import omero.*;
+import omero.api.IQueryPrx;
 import omero.gateway.Gateway;
 import omero.gateway.LoginCredentials;
 import omero.gateway.SecurityContext;
@@ -21,13 +21,18 @@ import omero.gateway.model.ExperimenterData;
 import omero.log.Logger;
 import omero.log.SimpleLogger;
 import net.dongliu.requests.*;
+import omero.model.IObject;
+import omero.sys.ParametersI;
 
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class Connect {
     public static  client idr_client;
+    private static List<RType> ab;
     public LoginCredentials cred;
     private ImageJ ij;
     public static Gateway gateway;
@@ -40,7 +45,8 @@ public class Connect {
     public static final int PORT = 0;
     public static final int groupId = -1;
 
-    Connect(ImageJ ij) throws DSOutOfServiceException, CannotCreateSessionException, PermissionDeniedException, ServerError {
+    Connect(ImageJ ij) throws DSOutOfServiceException, CannotCreateSessionException,
+            PermissionDeniedException, ServerError {
         this.ij = ij;
         System.out.println("Attempting to connect to IDR - Blitz ... ");
         cred = new LoginCredentials(USERNAME,PASSWORD, HOST, PORT);
@@ -61,11 +67,9 @@ public class Connect {
     public Gateway getGateway() {
         return gateway;
     }
-
     public SecurityContext getContext(){
         return context;
     }
-
     public client getClient(){
         return idr_client;
     }
@@ -164,6 +168,68 @@ public class Connect {
 //        new LociImporter().run(buffer.toString());
 //        IJ.runPlugIn("loci.plugins.LociImporter", buffer.toString());
     }
+
+    public static List<Long> getImageIDsByAnnotation(Long annid) throws DSOutOfServiceException, ServerError {
+//        obj_type.toLowerCase();
+        String sql = "select ob from Image ob left outer join fetch ob.annotationLinks obal left outer join fetch obal.child ann where ann.id in (:oids)";
+        IQueryPrx q = gateway.getQueryService(context);
+//        rtypes.wrap(annids);
+        ParametersI params = new ParametersI();
+        params.add("oids", rtypes.wrap(annid));
+        List<IObject> images_for_annotations_list = q.findAllByQuery(sql, params);
+        System.out.println("First a rrtype");
+        System.out.println(rtypes.unwrap(images_for_annotations_list.get(0).getId()));
+        System.out.println("List length");
+        System.out.println(images_for_annotations_list.size());
+        List<Long> imageIds = images_for_annotations_list.stream().map( n -> (Long) rtypes.unwrap(n.getId()) ).collect( Collectors.toList() );
+        return imageIds;
+
+//        List<List<RType>> projections = gateway.getQueryService(context).projection(sql, params);
+//        System.out.println(projections.size());
+//        IObject abc = a.get(0);
+//        System.out.println(rtypes.unwrap(abc.getId()));
+
+//        abcd.get(0);
+//        rtypes.unwrap(ab);
+//        List<ImageI> aa = projections.stream().map((n) -> rtypes.unwrap(n.get(0))).collect(Collectors.toList());
+//        System.out.println(projections.stream().map((n) -> (RObject) rtypes.unwrap(n.get(0))).collect(Collectors.toList()));
+//        for e in q.findAllByQuery(sql, p, self.SERVICE_OPTS):
+//        yield wrapper(self, e)
+//        IMetadataPrx metadata_service = gateway.getMetadataService(context);
+//        metadata_service.
+//        return null;
+    }
+
+
+//    def getObjectsByAnnotations(self, obj_type, annids):
+//            """
+//        Retrieve objects linked to the given annotation IDs
+//        controlled by the security system.
+//
+//        :param annids:      Annotation IDs
+//        :type annids:       :class:`Long`
+//        :return:            Generator yielding Objects
+//        :rtype:             :class:`BlitzObjectWrapper` generator
+//        """
+//
+//    wrapper = KNOWN_WRAPPERS.get(obj_type.lower(), None)
+//            if not wrapper:
+//    raise AttributeError("Don't know how to handle '%s'" % obj_type)
+//
+//    sql = "select ob from %s ob " \
+//            "left outer join fetch ob.annotationLinks obal " \
+//            "left outer join fetch obal.child ann " \
+//            "where ann.id in (:oids)" % wrapper().OMERO_CLASS
+//
+//            q = self.getQueryService()
+//    p = omero.sys.Parameters()
+//    p.map = {}
+//    p.map["oids"] = rlist([rlong(o) for o in set(annids)])
+//            for e in q.findAllByQuery(sql, p, self.SERVICE_OPTS):
+//    yield wrapper(self, e)
+
+
+
 
 //    void convertImagePlus(Image OmeroImage){
 //        ConvertService.convert(OmeroImage, ImagePlus.class);
