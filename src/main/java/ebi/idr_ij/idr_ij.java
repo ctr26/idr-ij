@@ -70,8 +70,7 @@ public class idr_ij implements Command {
 	public void run() {
 //		Debug entry point
 		try {
-			JSONObject screens = idr_api.JSONObjectScreenWithGene("CDC20");
-			System.out.println(screens.toString());
+
 //			Unirest session = Connect.getJSONSession();
 
 
@@ -91,19 +90,44 @@ public class idr_ij implements Command {
 
 //			connection.getDatasetImages(2966725L);
 //			idr_client.get
-//
+			String type = ebi.idr_ij.IDR_mapr.type.GENE;
 			String value = "CMPO_0000077";
 			String key = "Phenotype Term Accession";
 			String ns = "openmicroscopy.org/mapr/phenotype";
+			String gene = "CDC20";
+
+			List<JSONObject> temp = idr_api.JSONListImageWithType("gene",gene);
+			System.out.println(temp);
+			List<Long> temp_2 = idr_api.LongListImagesWithType("gene", gene);
+			System.out.println(temp_2);
+
+//			JSONObject screens = idr_api.JSONObjectScreenWithGene("CDC20");
+//			System.out.println(screens.toString());
+//			idr_api.JSON2CSV(Paths.get("/Users/ctr26/temp.csv"),screens);
 //
-			List<Long> annotations = Attributes.annotation_ids_by_field(context, gateway,value,key,ns);
+//			JSONObject image_data = idr_api.JSONImagesMetaData(2966725L);
+//			System.out.println(image_data.toString());
+//
+//			List<Long> a = idr_api.ListofPlatesWithGene(gene);
+//			System.out.println(a);
+//
+//			JSONObject images = idr_api.JSONImagesInParentWith("gene","CDC20","screen", String.valueOf(102L));
+//			System.out.println(images.toString());
 
-			List<String> annotationsString = Images.list_of_images_by_phenotype(context, gateway,value);
-			System.out.println("Found images with IDS:\n".concat(annotations.toString()));
-//			gui.populateList(annotationsString);
+///////////////
 
-			List<Long> aa = Connect.getImageIDsByAnnotation(annotations.get(0));
-			System.out.println(aa.toString());
+//			List<Long> annotations = Attributes.annotation_ids_by_field(context, gateway,value,key,ns);
+//
+//			List<String> annotationsString = Images.list_of_images_by_phenotype(context, gateway,value);
+//			System.out.println("Found images with IDS:\n".concat(annotations.toString()));
+////			gui.populateList(annotationsString);
+//
+//			List<Long> aa = Connect.getImageIDsByAnnotation(annotations.get(0));
+//			System.out.println(aa.toString());
+
+
+////////////////
+
 //			ImageData OME_image = Images.get_image(context, gateway, 2966725L);
 //			TransferFacility facility = gateway.getFacility(TransferFacility.class);
 //			gateway.getPixelsService()

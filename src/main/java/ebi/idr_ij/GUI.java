@@ -61,7 +61,7 @@ public class GUI extends javax.swing.JFrame {
 
         initWindowComponents();
         initGUIComponents();
-        initErrToDebugWindow();
+        //        initErrToDebugWindow();
         initListeners();
 //        images = new Images();
 //        attributes = new Attributes();

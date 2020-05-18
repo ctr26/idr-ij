@@ -111,7 +111,6 @@
     <orderEntry type="library" scope="RUNTIME" name="Maven: net.sf.jung:jung-api:2.0.1" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Maven: net.sourceforge.collections:collections-generic:4.01" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Maven: net.sf.jung:jung-graph-impl:2.0.1" level="project" />
-    <orderEntry type="library" name="Maven: org.ow2.asm:asm:5.0.4" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Maven: org.ow2.asm:asm-util:5.0.4" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Maven: org.ow2.asm:asm-tree:5.0.4" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Maven: org.ow2.asm:asm-commons:5.0.4" level="project" />
@@ -163,6 +162,14 @@
     <orderEntry type="library" name="Maven: commons-logging:commons-logging:1.2" level="project" />
     <orderEntry type="library" name="Maven: commons-collections:commons-collections:3.2.2" level="project" />
     <orderEntry type="library" name="Maven: com.zeroc:icegrid:3.6.5" level="project" />
+    <orderEntry type="library" name="Maven: com.github.opendevl:json2flat:1.0.3" level="project" />
+    <orderEntry type="library" name="Maven: com.jayway.jsonpath:json-path:2.2.0" level="project" />
+    <orderEntry type="library" name="Maven: net.minidev:json-smart:2.2.1" level="project" />
+    <orderEntry type="library" name="Maven: net.minidev:accessors-smart:1.1" level="project" />
+    <orderEntry type="library" name="Maven: org.ow2.asm:asm:5.0.3" level="project" />
+    <orderEntry type="library" name="Maven: com.fasterxml.jackson.core:jackson-databind:2.4.5" level="project" />
+    <orderEntry type="library" name="Maven: com.fasterxml.jackson.core:jackson-annotations:2.4.0" level="project" />
+    <orderEntry type="library" name="Maven: com.fasterxml.jackson.core:jackson-core:2.4.5" level="project" />
     <orderEntry type="library" name="Maven: omero:blitz:5.4.9-ice36-b101" level="project" />
     <orderEntry type="library" name="Maven: omero:server:5.4.9-ice36-b101" level="project" />
     <orderEntry type="library" name="Maven: omero:rendering:5.4.9-ice36-b101" level="project" />
@@ -217,9 +224,6 @@
     <orderEntry type="library" name="Maven: xpp3:xpp3:1.1.4c" level="project" />
     <orderEntry type="library" name="Maven: com.squareup.okhttp3:okhttp:3.7.0" level="project" />
     <orderEntry type="library" name="Maven: com.squareup.okio:okio:1.12.0" level="project" />
-    <orderEntry type="library" name="Maven: com.fasterxml.jackson.core:jackson-annotations:2.9.6" level="project" />
-    <orderEntry type="library" name="Maven: com.fasterxml.jackson.core:jackson-core:2.9.6" level="project" />
-    <orderEntry type="library" name="Maven: com.fasterxml.jackson.core:jackson-databind:2.9.6" level="project" />
     <orderEntry type="library" name="Maven: ch.qos.logback:logback-core:1.2.3" level="project" />
     <orderEntry type="library" name="Maven: org.openmicroscopy:ome-xml:6.0.0" level="project" />
     <orderEntry type="library" name="Maven: ome:formats-bsd:6.0.0" level="project" />

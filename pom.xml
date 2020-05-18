@@ -101,6 +101,11 @@
 			<artifactId>omero-gateway</artifactId>
 			<version>5.6.2</version>
 		</dependency>
+		<dependency>
+			<groupId>com.github.opendevl</groupId>
+			<artifactId>json2flat</artifactId>
+			<version>1.0.3</version>
+		</dependency>
 <!--		<dependency>-->
 <!--			<groupId>org.openmicroscopy</groupId>-->
 <!--			<artifactId>omero-api</artifactId>-->
