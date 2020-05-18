@@ -96,10 +96,17 @@ public class idr_ij implements Command {
 			String ns = "openmicroscopy.org/mapr/phenotype";
 			String gene = "CDC20";
 
-			List<JSONObject> temp = idr_api.JSONListImageWithType("gene",gene);
-			System.out.println(temp);
-			List<Long> temp_2 = idr_api.LongListImagesWithType("gene", gene);
-			System.out.println(temp_2);
+//			List<JSONObject> temp = idr_api.JSONListImageWithType("gene",gene);
+//			System.out.println(temp);
+//			List<JSONObject> temp3 = idr_api.JSONListImageWithTypeIn("gene",gene,"screens");
+//			System.out.println(temp3);
+
+			List<JSONObject> temp4 = idr_api.JSONListImageWithTypeIn("gene",gene,"projects");
+			System.out.println(temp4);
+
+
+//			List<Long> temp_2 = idr_api.LongListImagesWithType("gene", gene);
+//			System.out.println(temp_2);
 
 //			JSONObject screens = idr_api.JSONObjectScreenWithGene("CDC20");
 //			System.out.println(screens.toString());

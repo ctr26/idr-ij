@@ -1,5 +1,5 @@
 package ebi.idr_ij;
-
+//https://github.com/openssbd/CombineSearch-OMERO/blob/master/CombineSearch-OMERO.ipynb
 import com.github.opendevl.JFlat;
 import ebi.idr_ij.IDR_mapr.container;
 import ebi.idr_ij.IDR_mapr.type;
@@ -63,7 +63,7 @@ public class IDR_API {
         StrSubstitutor sub = new StrSubstitutor(formatMap, "{", "}");
         String result = sub.replace(url.toString());
 //        JSONObject jsonScreensWithGene = JSONfromURL(new URL(result));
-//        System.out.println(result);
+        System.out.println(result);
         return JSONfromURL(new URL(result));
     }
 
@@ -120,6 +120,8 @@ public class IDR_API {
         return JSONMappedURL(image_url, formatMap);
     }
 
+    // Only worked for screens before.
+    @Deprecated
     public List<JSONObject> JSONListImageWithType(String type,String value) throws IOException, JSONException {
         List<Long> screen_ids = ListTypeWithContainer(type, value, "screens");
 
@@ -135,10 +137,11 @@ public class IDR_API {
             String current_plate_id = json_plates.getJSONArray("plates").getJSONObject(0).getString("id");
             list_of_plate_ids.add(Long.parseLong(current_plate_id));
             for(Long plate_ids:list_of_plate_ids) {
-                JSONObject json_images = JsonTypeWithContainerGivenParent(type, value, "images", container.PLATE, current_plate_id);
+                JSONObject json_images = JsonTypeWithContainerGivenParent(type, value, container.IMAGES, container.PLATE, current_plate_id);
                 json_list_images.add(json_images);
             }
         }
+
 
 
 //        long screen_id = screens.get(0);
@@ -151,6 +154,53 @@ public class IDR_API {
 //        System.out.println(json_list_images);
         return json_list_images;
     }
+
+    public List<JSONObject> JSONListImageWithTypeIn(String type,String value,String container_type) throws IOException, JSONException {
+
+        String container_top,container_tops,container_mid,container_mids;
+        container_top = container_tops= container_mid = container_mids = null;
+
+        if (container_type.equals("screens")) {
+            container_top = container.SCREEN;
+            container_tops = container.SCREENS;
+            container_mid = container.PLATE;
+            container_mids = container.PLATES;
+        } else if (container_type.equals("projects")) {
+            container_top = container.PROJECT;
+            container_tops = container.PROJECTS;
+            container_mid = container.DATASET;
+            container_mids = container.DATASETS;
+        }
+
+        List<Long> screen_ids = ListTypeWithContainer(type, value, container_tops);
+
+        List<JSONObject> json_list_plates = new ArrayList<>();
+        List<JSONObject> json_list_images = new ArrayList<>();
+
+        List<Long> list_of_plate_ids = new ArrayList<>();
+
+        for (Long screen_id : screen_ids) {
+            JSONObject json_plates = JsonTypeWithContainerGivenParent(type, value, container_mids, container_top, String.valueOf(screen_id));
+            json_list_plates.add(json_plates);
+
+            String current_plate_id = json_plates.getJSONArray(container_mids).getJSONObject(0).getString("id");
+            list_of_plate_ids.add(Long.parseLong(current_plate_id));
+            for (Long plate_ids : list_of_plate_ids) {
+                JSONObject json_images = JsonTypeWithContainerGivenParent(type, value, container.IMAGES, container_mid, current_plate_id);
+                json_list_images.add(json_images);
+            }
+        }
+        return json_list_images;
+    }
+
+    List<JSONObject> JSONListImageWithTypeInScreens(String type, String value) throws IOException, JSONException {
+        return JSONListImageWithTypeIn(type,value,container.SCREENS);
+    }
+
+    List<JSONObject> JSONListImageWithTypeInProjects(String type, String value) throws IOException, JSONException {
+        return JSONListImageWithTypeIn(type,value,container.PROJECTS);
+    }
+
 //    Object ImagesWithTypeInDataset(String type, String value,){
 //        return null;
 //    }
