@@ -1,5 +1,10 @@
 package ebi.idr_ij;
 //import javax.swing.*;
+
+import ebi.idr_ij.IDR_mapr.container;
+import ebi.idr_ij.IDR_mapr.containers;
+import ebi.idr_ij.IDR_mapr.type;
+
 import net.imagej.Dataset;
 import net.imagej.ImageJ;
 import omero.ServerError;
@@ -9,16 +14,20 @@ import omero.gateway.SecurityContext;
 
 import java.awt.event.*;
 import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Vector;
 
 public class GUI extends javax.swing.JFrame {
+    private GUI frame;
     private client idr_client;
     private Attributes attributes;
     private Images images;
@@ -45,6 +54,13 @@ public class GUI extends javax.swing.JFrame {
     private JButton populateListGenotypeButton;
     private JButton populateListPhenotype;
     private JScrollPane debugGUI;
+    private JComboBox JSONtypeCombo;
+    private JComboBox JSONcontainerCombo;
+    private JTextField JSONvalue;
+    private JButton downloadButton1;
+    private JPanel maprTab;
+    private JButton populateListButton;
+    private JPanel byPhenoTab;
 
     private Long ongImageLongValue;
     private Gateway gateway;
@@ -52,12 +68,13 @@ public class GUI extends javax.swing.JFrame {
     private String genotypeText;
     private Vector<String> vct;
 
-    public GUI(Connect connection, Gateway gateway, SecurityContext context, ImageJ ij, client idr_client) {
+    public GUI(Connect connection, Gateway gateway, SecurityContext context, ImageJ ij, client idr_client)  {
         this.connection = connection;
         this.gateway = gateway;
         this.context = context;
         this.ij = ij;
         this.idr_client = idr_client;
+        frame = this;
 
         initWindowComponents();
         initGUIComponents();
@@ -65,6 +82,22 @@ public class GUI extends javax.swing.JFrame {
         initListeners();
 //        images = new Images();
 //        attributes = new Attributes();
+        downloadButton1.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JFileChooser file_chooser_window = new JFileChooser();
+                file_chooser_window.setFileSelectionMode(JFileChooser.FILES_ONLY);
+//                file_chooser_window
+                file_chooser_window.addChoosableFileFilter(new FileNameExtensionFilter("JSON file", "json"));
+                file_chooser_window.addChoosableFileFilter(new FileNameExtensionFilter("CSV file", "csv"));
+                file_chooser_window.setAcceptAllFileFilterUsed(false);
+                int returnVal = file_chooser_window.showSaveDialog(frame);
+                if (returnVal == JFileChooser.APPROVE_OPTION) {
+                    File file = file_chooser_window.getSelectedFile();
+                    String path = file.getAbsolutePath();
+                }
+            }
+        });
     }
 
     private void initErrToDebugWindow() {
@@ -152,7 +185,7 @@ public class GUI extends javax.swing.JFrame {
         });
     }
 
-    void initGUIComponents(){
+    void initGUIComponents() {
         System.out.println("Building GUI");
         Dimension panelSize = masterPanel.getPreferredSize();
         this.setContentPane(masterPanel);
@@ -163,9 +196,20 @@ public class GUI extends javax.swing.JFrame {
         // Setup jspinner numbers
         JSpinner.NumberEditor editor = new JSpinner.NumberEditor(oneImageLongField, "#");
         oneImageLongField.setEditor(editor);
-
-
         this.pack();
+        createComboBoxes();
+    }
+
+    void createComboBoxes() {
+        try {
+            for(Field type : type.class.getFields()) JSONtypeCombo.addItem((String) type.get(null));
+            JSONcontainerCombo.addItem("projects");
+            JSONcontainerCombo.addItem("screens");
+            JSONcontainerCombo.addItem("both");
+//            for(Field containers : containers.class.getFields()) JSONcontainerCombo.addItem((String) containers.get(null));
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
     }
 
     public void guiSettingsChange(PropertyChangeEvent e){
