@@ -1,8 +1,6 @@
 package ebi.idr_ij;
 //import javax.swing.*;
 
-import ebi.idr_ij.IDR_mapr.container;
-import ebi.idr_ij.IDR_mapr.containers;
 import ebi.idr_ij.IDR_mapr.type;
 
 import net.imagej.Dataset;
@@ -11,6 +9,8 @@ import omero.ServerError;
 import omero.client;
 import omero.gateway.Gateway;
 import omero.gateway.SecurityContext;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.awt.event.*;
 import javax.swing.*;
@@ -18,13 +18,12 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.io.File;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PrintStream;
+import java.io.*;
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Vector;
+
+import static ebi.idr_ij.IDR_API.JSONListImageWithTypeInBothDownload;
 
 public class GUI extends javax.swing.JFrame {
     private GUI frame;
@@ -36,7 +35,6 @@ public class GUI extends javax.swing.JFrame {
     private JTabbedPane tabbedPanel;
     private JList<String> imageList;
     private JButton openImages;
-    private JButton populateList;
     private JPanel oneImageTab;
     private JSpinner oneImageLongField;
     private JPanel masterPanel;
@@ -57,7 +55,7 @@ public class GUI extends javax.swing.JFrame {
     private JComboBox JSONtypeCombo;
     private JComboBox JSONcontainerCombo;
     private JTextField JSONvalue;
-    private JButton downloadButton1;
+    private JButton maprDownloadButton;
     private JPanel maprTab;
     private JButton populateListButton;
     private JPanel byPhenoTab;
@@ -82,9 +80,10 @@ public class GUI extends javax.swing.JFrame {
         initListeners();
 //        images = new Images();
 //        attributes = new Attributes();
-        downloadButton1.addActionListener(new ActionListener() {
+        maprDownloadButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+//                Get path from file choose
                 JFileChooser file_chooser_window = new JFileChooser();
                 file_chooser_window.setFileSelectionMode(JFileChooser.FILES_ONLY);
 //                file_chooser_window
@@ -94,7 +93,17 @@ public class GUI extends javax.swing.JFrame {
                 int returnVal = file_chooser_window.showSaveDialog(frame);
                 if (returnVal == JFileChooser.APPROVE_OPTION) {
                     File file = file_chooser_window.getSelectedFile();
+                    String extension = file_chooser_window.getFileFilter().getDescription();
+
                     String path = file.getAbsolutePath();
+                    String type = JSONtypeCombo.getSelectedItem().toString();
+                    String container = JSONcontainerCombo.getSelectedItem().toString();
+                    String value = JSONvalue.getText();
+                    try {
+                        IDR_API.JSONListImageWithTypeInBothDownload(type,value,container,path);
+                    } catch (IOException | JSONException ex) {
+                        ex.printStackTrace();
+                    }
                 }
             }
         });

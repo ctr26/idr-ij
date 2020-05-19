@@ -26,6 +26,9 @@ import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 
+import static ebi.idr_ij.IDR_API.JSONListImageWithTypeInBoth;
+import static ebi.idr_ij.IDR_API.JSONListImageWithTypeInBothDownload;
+
 /**
  * A very simple plugin.
  * <p>
@@ -55,10 +58,10 @@ public class idr_ij implements Command {
 	private static client idr_client;
 	private static GUI gui;
 	private static IDR_API idr_api;
-	@Parameter(label = "What is your name?")
-	private String name = "J. Doe";
+//	@Parameter(label = "What is your name?")
+//	private String name = "J. Doe";
 
-	@Parameter(type = ItemIO.OUTPUT)
+//	@Parameter(type = ItemIO.OUTPUT)
 	public static Gateway gateway;
 	public static final String username = "public";
 	public static final String password = "public";
@@ -92,6 +95,7 @@ public class idr_ij implements Command {
 //			idr_client.get
 			String type = ebi.idr_ij.IDR_mapr.type.GENE;
 			String value = "CMPO_0000077";
+			String path = "/Users/ctr26/Desktop/temp.json";
 			String key = "Phenotype Term Accession";
 			String ns = "openmicroscopy.org/mapr/phenotype";
 			String gene = "CDC20";
@@ -101,9 +105,11 @@ public class idr_ij implements Command {
 //			List<JSONObject> temp3 = idr_api.JSONListImageWithTypeIn("gene",gene,"screens");
 //			System.out.println(temp3);
 
-			List<JSONObject> temp4 = idr_api.JSONListImageWithTypeIn("gene",gene,"projects");
-			System.out.println(temp4);
+//			List<JSONObject> temp4 = IDR_API.JSONListImageWithTypeIn("gene",gene,"projects");
+//			System.out.println(temp4);
 
+			JSONListImageWithTypeInBothDownload(type,gene,"projects",path);
+			JSONListImageWithTypeInBothDownload(type,gene,"screens",path);
 
 //			List<Long> temp_2 = idr_api.LongListImagesWithType("gene", gene);
 //			System.out.println(temp_2);
