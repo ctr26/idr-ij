@@ -2,6 +2,7 @@ package ebi.idr_ij;
 //https://github.com/openssbd/CombineSearch-OMERO/blob/master/CombineSearch-OMERO.ipynb
 import com.github.opendevl.JFlat;
 import ebi.idr_ij.IDR_mapr.container;
+import ebi.idr_ij.IDR_mapr.containers;
 import ebi.idr_ij.IDR_mapr.type;
 import org.apache.commons.lang.text.StrSubstitutor;
 import org.json.JSONArray;
@@ -137,7 +138,7 @@ public class IDR_API {
             String current_plate_id = json_plates.getJSONArray("plates").getJSONObject(0).getString("id");
             list_of_plate_ids.add(Long.parseLong(current_plate_id));
             for(Long plate_ids:list_of_plate_ids) {
-                JSONObject json_images = JsonTypeWithContainerGivenParent(type, value, container.IMAGES, container.PLATE, current_plate_id);
+                JSONObject json_images = JsonTypeWithContainerGivenParent(type, value, containers.IMAGES, container.PLATE, current_plate_id);
                 json_list_images.add(json_images);
             }
         }
@@ -162,14 +163,14 @@ public class IDR_API {
 
         if (container_type.equals("screens")) {
             container_top = container.SCREEN;
-            container_tops = container.SCREENS;
+            container_tops = containers.SCREENS;
             container_mid = container.PLATE;
-            container_mids = container.PLATES;
+            container_mids = containers.PLATES;
         } else if (container_type.equals("projects")) {
             container_top = container.PROJECT;
-            container_tops = container.PROJECTS;
+            container_tops = containers.PROJECTS;
             container_mid = container.DATASET;
-            container_mids = container.DATASETS;
+            container_mids = containers.DATASETS;
         }
 
         List<Long> screen_ids = ListTypeWithContainer(type, value, container_tops);
@@ -186,7 +187,7 @@ public class IDR_API {
             String current_plate_id = json_plates.getJSONArray(container_mids).getJSONObject(0).getString("id");
             list_of_plate_ids.add(Long.parseLong(current_plate_id));
             for (Long plate_ids : list_of_plate_ids) {
-                JSONObject json_images = JsonTypeWithContainerGivenParent(type, value, container.IMAGES, container_mid, current_plate_id);
+                JSONObject json_images = JsonTypeWithContainerGivenParent(type, value, containers.IMAGES, container_mid, current_plate_id);
                 json_list_images.add(json_images);
             }
         }
@@ -194,11 +195,11 @@ public class IDR_API {
     }
 
     List<JSONObject> JSONListImageWithTypeInScreens(String type, String value) throws IOException, JSONException {
-        return JSONListImageWithTypeIn(type,value,container.SCREENS);
+        return JSONListImageWithTypeIn(type,value,containers.SCREENS);
     }
 
     List<JSONObject> JSONListImageWithTypeInProjects(String type, String value) throws IOException, JSONException {
-        return JSONListImageWithTypeIn(type,value,container.PROJECTS);
+        return JSONListImageWithTypeIn(type,value,containers.PROJECTS);
     }
 
 //    Object ImagesWithTypeInDataset(String type, String value,){

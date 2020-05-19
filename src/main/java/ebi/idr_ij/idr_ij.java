@@ -187,7 +187,7 @@ public class idr_ij implements Command {
 	 * @param args unused
 	 */
 
-	public static void main(final String... args) {
+	public static void main(final String... args) throws IllegalAccessException {
 		// Launch ImageJ as usual.
 		 ij = new ImageJ();
 //		ij.launch(args);

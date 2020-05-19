@@ -1,14 +1,12 @@
 package ebi.idr_ij.IDR_mapr;
 
-public interface container {
+public interface containers {
 
-        String PROJECT = "project";
-
-        String PLATE = "plate";
-        String DATASET = "dataset";
-        String SCREEN = "screen";
-
-        String IMAGE = "image";
+        String PROJECTS = "projects";
+        String PLATES = "plates";
+        String DATASETS = "datasets";
+        String SCREENS = "screens";
+        String IMAGES = "images";
 
 }
 //    public static final String PLATES = "plates";
