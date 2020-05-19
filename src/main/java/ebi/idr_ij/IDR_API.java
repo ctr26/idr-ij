@@ -4,10 +4,13 @@ import com.github.opendevl.JFlat;
 import ebi.idr_ij.IDR_mapr.container;
 import ebi.idr_ij.IDR_mapr.containers;
 import ebi.idr_ij.IDR_mapr.type;
+import net.dongliu.commons.Sys;
 import org.apache.commons.lang.text.StrSubstitutor;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.json.JSONWriter;
+
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -33,7 +36,7 @@ public class IDR_API {
         con.getInputStream().close();
     }
 
-    HttpURLConnection connectToUrl(URL url) throws IOException {
+    static HttpURLConnection connectToUrl(URL url) throws IOException {
         HttpURLConnection httpCon = (HttpURLConnection) url.openConnection();
         httpCon.setRequestMethod("GET");
         return httpCon;
@@ -43,7 +46,7 @@ public class IDR_API {
         return JSONTypeWith(type.GENE, gene);
     }
 
-    public JSONObject JSONTypeWith(String key, String value) throws IOException, JSONException {
+    public static JSONObject JSONTypeWith(String key, String value) throws IOException, JSONException {
 
         URL SCREENS_PROJECTS_URL = new URL("https://idr.openmicroscopy.org/mapr/api/{key}/?value={value}");
         HashMap<String, String> formatMap = new HashMap<>();
@@ -56,7 +59,7 @@ public class IDR_API {
     }
 
 
-    public JSONObject JSONMappedURL(URL url, HashMap formatMap) throws IOException, JSONException {
+    public static JSONObject JSONMappedURL(URL url, HashMap formatMap) throws IOException, JSONException {
 //        URL SCREENS_PROJECTS_URL = new URL("https://idr.openmicroscopy.org/mapr/api/{key}/?value={value}");
 //        HashMap<String, String> formatMap = new HashMap<>();
 //        formatMap.put("key", key);
@@ -68,7 +71,7 @@ public class IDR_API {
         return JSONfromURL(new URL(result));
     }
 
-    public JSONObject JSONfromURL(URL url) throws IOException {
+    public static JSONObject JSONfromURL(URL url) throws IOException {
 //        System.out.println("JSON");
 //        String jsonInputString = JSONRequest.toString();
         HttpURLConnection con = connectToUrl(url);
@@ -94,7 +97,7 @@ public class IDR_API {
         return jsonObject;
     }
 
-    public List<Long> ListTypeWithContainer(String type, String value,String container) throws IOException,
+    public static List<Long> ListTypeWithContainer(String type, String value, String container) throws IOException,
             JSONException {
 //        System.out.println(JSONTypeWith(type,value));
         JSONArray screens = JSONTypeWith(type,value).getJSONArray(container);
@@ -110,7 +113,7 @@ public class IDR_API {
     return ipArray;
     }
 
-    public JSONObject JsonTypeWithContainerGivenParent(String type, String value,String container, String parent_id,String id) throws IOException, JSONException {
+    public static JSONObject JsonTypeWithContainerGivenParent(String type, String value, String container, String parent_id, String id) throws IOException, JSONException {
         URL image_url = new URL("https://idr.openmicroscopy.org/mapr/api/{type}/{container}/?value={value}&node={parent_id}&id={id}");
         HashMap<String, String> formatMap = new HashMap<>();
         formatMap.put("type", type);
@@ -156,7 +159,7 @@ public class IDR_API {
         return json_list_images;
     }
 
-    public List<JSONObject> JSONListImageWithTypeIn(String type,String value,String container_type) throws IOException, JSONException {
+    public static List<JSONObject> JSONListImageWithTypeIn(String type, String value, String container_type) throws IOException, JSONException {
 
         String container_top,container_tops,container_mid,container_mids;
         container_top = container_tops= container_mid = container_mids = null;
@@ -194,12 +197,42 @@ public class IDR_API {
         return json_list_images;
     }
 
-    List<JSONObject> JSONListImageWithTypeInScreens(String type, String value) throws IOException, JSONException {
+    static List<JSONObject> JSONListImageWithTypeInScreens(String type, String value) throws IOException, JSONException {
         return JSONListImageWithTypeIn(type,value,containers.SCREENS);
     }
 
-    List<JSONObject> JSONListImageWithTypeInProjects(String type, String value) throws IOException, JSONException {
+    static List<JSONObject> JSONListImageWithTypeInProjects(String type, String value) throws IOException, JSONException {
         return JSONListImageWithTypeIn(type,value,containers.PROJECTS);
+    }
+
+    static List<JSONObject> JSONListImageWithTypeInBoth(String type, String value,String container) throws IOException, JSONException {
+        List<JSONObject> json_list;
+        if (container.equals("both")) {
+            json_list = IDR_API.JSONListImageWithTypeInProjects(type, value);
+            json_list.addAll(IDR_API.JSONListImageWithTypeInScreens(type, value));
+        } else {
+            json_list = IDR_API.JSONListImageWithTypeIn(type, value,container);
+        }
+        System.out.println("JSONListImageWithTypeInBoth");
+        System.out.println(json_list);
+        return json_list;
+    }
+
+    static void JSONListImageWithTypeInBothDownload(String type, String value,String container,String path) throws IOException, JSONException {
+        FileWriter file_out = new FileWriter(path);
+        List<JSONObject> json_list = JSONListImageWithTypeInBoth(type, value, container);
+//        System.out.println(json_list);
+//        System.out.println(json_list.toString());
+//        json_list.toString()
+//        new JSONArray(json_list).write(file_out);
+//        JSONArray a = new JSONArray(json_list);
+
+//        System.out.println(json_list_string);
+        file_out.write(new JSONArray(json_list).toString(4));
+        file_out.close();
+
+//        JSONWriter json_writer = new JSONWriter(file_out);
+//        json_writer.value(new JSONArray(json_list));
     }
 
 //    Object ImagesWithTypeInDataset(String type, String value,){
