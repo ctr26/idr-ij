@@ -196,17 +196,25 @@ public class GUI extends javax.swing.JFrame {
 
     void initGUIComponents() {
         System.out.println("Building GUI");
+
+        createComboBoxes();
+        JSpinner.NumberEditor editor = new JSpinner.NumberEditor(oneImageLongField, "#");
+        oneImageLongField.setEditor(editor);
+
         Dimension panelSize = masterPanel.getPreferredSize();
         this.setContentPane(masterPanel);
         this.setLocationRelativeTo(null); //Centering
-        this.setResizable(false);
+        this.pack();
+//        this.setResizable(false);
         this.setVisible(true);
 
         // Setup jspinner numbers
-        JSpinner.NumberEditor editor = new JSpinner.NumberEditor(oneImageLongField, "#");
-        oneImageLongField.setEditor(editor);
-        this.pack();
-        createComboBoxes();
+
+
+//        this.setSize(panelSize);
+//        this.pack();
+
+
     }
 
     void createComboBoxes() {
@@ -230,7 +238,7 @@ public class GUI extends javax.swing.JFrame {
         this.ongImageLongValue = Long.valueOf((Integer)oneImageLongField.getValue());
         this.genotypeText = geneotypeField.getText();
 
-        System.out.println(ongImageLongValue);
+//        System.out.println(ongImageLongValue);
         this.revalidate();
     }
 
