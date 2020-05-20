@@ -88,16 +88,17 @@ public class idr_ij implements Command {
 		}
 		//			ClientConnect clientConnection = new ClientConnect(ij);
 //			context = connect();
+		ij = new ImageJ();
+//		run();
 	}
 
 	@Override
 	public void run() {
-		ij = new ImageJ();
 //		ij.launch(args);
 		gui = new GUI(connection,gateway,context,ij,idr_client);
 //		Debug entry point
 		try {
-
+			debug();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -223,7 +224,7 @@ public class idr_ij implements Command {
 
 	public static void main(final String... args) throws IllegalAccessException {
 		// Launch ImageJ as usual.
-//			new idr_ij().run();
+			new idr_ij().run();
 		// Headless stuff goes through here maybe?
 	}
 
