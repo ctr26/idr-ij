@@ -8,6 +8,7 @@
 package ebi.idr_ij;
 import net.imagej.ImageJ;
 import omero.*;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import omero.gateway.Gateway;
@@ -69,10 +70,7 @@ public class idr_ij implements Command {
 	public static final int port = 0;
 	public Map<String, Long> IDR_projects;
 
-	@Override
-	public void run() {
-		ij = new ImageJ();
-//		ij.launch(args);
+	idr_ij(){
 		try {
 			connection = new Connect(ij);
 			gateway = connection.getGateway();
@@ -88,12 +86,25 @@ public class idr_ij implements Command {
 			e.printStackTrace();
 			System.out.println("API connection failed");
 		}
-
-//			ClientConnect clientConnection = new ClientConnect(ij);
+		//			ClientConnect clientConnection = new ClientConnect(ij);
 //			context = connect();
+	}
+
+	@Override
+	public void run() {
+		ij = new ImageJ();
+//		ij.launch(args);
 		gui = new GUI(connection,gateway,context,ij,idr_client);
 //		Debug entry point
 		try {
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+	}
+
+	public void debug() throws IOException, JSONException {
 
 //			Unirest session = Connect.getJSONSession();
 
@@ -114,12 +125,12 @@ public class idr_ij implements Command {
 
 //			connection.getDatasetImages(2966725L);
 //			idr_client.get
-			String type = ebi.idr_ij.IDR_mapr.type.GENE;
-			String value = "CMPO_0000077";
-			String path = "/Users/ctr26/Desktop/temp.json";
-			String key = "Phenotype Term Accession";
-			String ns = "openmicroscopy.org/mapr/phenotype";
-			String gene = "CDC20";
+		String type = ebi.idr_ij.IDR_mapr.type.GENE;
+		String value = "CMPO_0000077";
+		String path = "/Users/ctr26/Desktop/temp.json";
+		String key = "Phenotype Term Accession";
+		String ns = "openmicroscopy.org/mapr/phenotype";
+		String gene = "CDC20";
 
 //			List<JSONObject> temp = idr_api.JSONListImageWithType("gene",gene);
 //			System.out.println(temp);
@@ -129,8 +140,8 @@ public class idr_ij implements Command {
 //			List<JSONObject> temp4 = IDR_API.JSONListImageWithTypeIn("gene",gene,"projects");
 //			System.out.println(temp4);
 
-			JSONListImageWithTypeInBothDownload(type,gene,"projects",path);
-			JSONListImageWithTypeInBothDownload(type,gene,"screens",path);
+		JSONListImageWithTypeInBothDownload(type,gene,"projects",path);
+		JSONListImageWithTypeInBothDownload(type,gene,"screens",path);
 
 //			List<Long> temp_2 = idr_api.LongListImagesWithType("gene", gene);
 //			System.out.println(temp_2);
@@ -189,10 +200,6 @@ public class idr_ij implements Command {
 
 
 //			image.get
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
 	}
 
 	/**
@@ -216,7 +223,8 @@ public class idr_ij implements Command {
 
 	public static void main(final String... args) throws IllegalAccessException {
 		// Launch ImageJ as usual.
-			new idr_ij().run();
+//			new idr_ij().run();
+		// Headless stuff goes through here maybe?
 	}
 
 
