@@ -325,7 +325,10 @@
             <preferred-size width="150" height="150"/>
           </grid>
         </constraints>
-        <properties/>
+        <properties>
+          <enabled value="false"/>
+          <visible value="false"/>
+        </properties>
       </component>
     </children>
   </grid>
