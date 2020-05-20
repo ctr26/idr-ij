@@ -18,6 +18,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
+import ebi.idr_ij.IDR_mapr.type;
 
 public class Images {
     private static String value = "CMPO_0000077";
@@ -54,6 +55,20 @@ public class Images {
         return annotations.stream()
                 .map(s->String.valueOf(s))
                 .collect(Collectors.toList());
+    }
+
+    public static List<String> list_of_images_by(SecurityContext context, Gateway gateway, String accession_type, String value){
+        switch(accession_type) {
+            case type.GENE:
+//                Placeholder
+                break;
+            case type.PHENOTYPE:
+                System.out.println("Phenotype");
+                return list_of_images_by_phenotype(context,gateway,value);
+            default:
+                break;
+        }
+    return null;
     }
 
 

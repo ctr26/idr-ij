@@ -2,6 +2,7 @@ package ebi.idr_ij;
 //import javax.swing.*;
 
 import ebi.idr_ij.IDR_mapr.type;
+import ebi.idr_ij.IDR_mapr.type;
 
 import net.imagej.Dataset;
 import net.imagej.ImageJ;
@@ -10,7 +11,6 @@ import omero.client;
 import omero.gateway.Gateway;
 import omero.gateway.SecurityContext;
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.awt.event.*;
 import javax.swing.*;
@@ -22,8 +22,6 @@ import java.io.*;
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Vector;
-
-import static ebi.idr_ij.IDR_API.JSONListImageWithTypeInBothDownload;
 
 public class GUI extends javax.swing.JFrame {
     private GUI frame;
@@ -39,7 +37,6 @@ public class GUI extends javax.swing.JFrame {
     private JSpinner oneImageLongField;
     private JPanel masterPanel;
     private JButton quickOpenButton;
-    private JPanel byGenesTab;
     private JPanel downloadTab;
     private JFormattedTextField downloadLocation;
     private JButton downloadButton;
@@ -59,6 +56,7 @@ public class GUI extends javax.swing.JFrame {
     private JPanel maprTab;
     private JButton populateListButton;
     private JPanel byPhenoTab;
+    private JComboBox gatewayCombo;
 
     private Long ongImageLongValue;
     private Gateway gateway;
@@ -143,22 +141,19 @@ public class GUI extends javax.swing.JFrame {
             }
         });
 
-        populateListGenotypeButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-            }
-        });
+//        populateListGenotypeButton.addActionListener(new ActionListener() {
+//            @Override
+//            public void actionPerformed(ActionEvent e) {
+//            }
+//        });
 
         populateListPhenotype.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-//                String value = "CMPO_0000077";
-//                String key = "Phenotype Term Accession";
-//                String ns = "openmicroscopy.org/mapr/phenotype";
-//                List<Long> annotations = Attributes.annotation_ids_by_field(context, gateway,value,key,ns);
+                String accession_type = (String) gatewayCombo.getSelectedItem().toString();
                 System.out.println("From phentotype: ".concat(phenotypeField.getText()));
-                List<String> annotationsString = Images.list_of_images_by_phenotype(context, gateway,
-                                                                                    phenotypeField.getText());
+                List<String> annotationsString = Images.list_of_images_by(context, gateway,type.PHENOTYPE,
+                        phenotypeField.getText());
                 System.out.println("Found images with IDS:\n".concat(String.join(",", annotationsString)));
                 populateList(annotationsString);
             }
@@ -197,7 +192,9 @@ public class GUI extends javax.swing.JFrame {
     void initGUIComponents() {
         System.out.println("Building GUI");
 
-        createComboBoxes();
+        createComboBoxesMapr();
+        createComboBoxesGateway();
+
         JSpinner.NumberEditor editor = new JSpinner.NumberEditor(oneImageLongField, "#");
         oneImageLongField.setEditor(editor);
 
@@ -217,9 +214,17 @@ public class GUI extends javax.swing.JFrame {
 
     }
 
-    void createComboBoxes() {
+    void createComboBoxesGateway(){
         try {
-            for(Field type : type.class.getFields()) JSONtypeCombo.addItem((String) type.get(null));
+            populateComboFromInterface(gatewayCombo);
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+    }
+
+    void createComboBoxesMapr() {
+        try {
+            populateComboFromInterface(JSONtypeCombo);
             JSONcontainerCombo.addItem("projects");
             JSONcontainerCombo.addItem("screens");
             JSONcontainerCombo.addItem("both");
@@ -229,6 +234,11 @@ public class GUI extends javax.swing.JFrame {
         }
     }
 
+
+    void populateComboFromInterface(JComboBox CombobBox) throws IllegalAccessException {
+        for(Field type : type.class.getFields()) CombobBox.addItem((String) type.get(null));
+    }
+
     public void guiSettingsChange(PropertyChangeEvent e){
         try {
             oneImageLongField.commitEdit();
@@ -236,7 +246,6 @@ public class GUI extends javax.swing.JFrame {
             ex.printStackTrace();
         }
         this.ongImageLongValue = Long.valueOf((Integer)oneImageLongField.getValue());
-        this.genotypeText = geneotypeField.getText();
 
 //        System.out.println(ongImageLongValue);
         this.revalidate();
