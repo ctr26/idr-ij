@@ -71,6 +71,27 @@ public class idr_ij implements Command {
 
 	@Override
 	public void run() {
+		ij = new ImageJ();
+//		ij.launch(args);
+		try {
+			connection = new Connect(ij);
+			gateway = connection.getGateway();
+			context = connection.getContext();
+			idr_client = connection.getClient();
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.out.println("Connection failed");
+		}
+		try {
+			idr_api = new IDR_API();
+		} catch (IOException e) {
+			e.printStackTrace();
+			System.out.println("API connection failed");
+		}
+
+//			ClientConnect clientConnection = new ClientConnect(ij);
+//			context = connect();
+		gui = new GUI(connection,gateway,context,ij,idr_client);
 //		Debug entry point
 		try {
 
@@ -195,27 +216,6 @@ public class idr_ij implements Command {
 
 	public static void main(final String... args) throws IllegalAccessException {
 		// Launch ImageJ as usual.
-		 ij = new ImageJ();
-//		ij.launch(args);
-		try {
-			connection = new Connect(ij);
-			gateway = connection.getGateway();
-			context = connection.getContext();
-			idr_client = connection.getClient();
-		} catch (Exception e) {
-			e.printStackTrace();
-			System.out.println("Connection failed");
-		}
-		try {
-			idr_api = new IDR_API();
-		} catch (IOException e) {
-			e.printStackTrace();
-			System.out.println("API connection failed");
-		}
-
-//			ClientConnect clientConnection = new ClientConnect(ij);
-//			context = connect();
-			gui = new GUI(connection,gateway,context,ij,idr_client);
 			new idr_ij().run();
 	}
 
