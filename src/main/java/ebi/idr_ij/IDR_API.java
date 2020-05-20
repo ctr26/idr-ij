@@ -4,12 +4,10 @@ import com.github.opendevl.JFlat;
 import ebi.idr_ij.IDR_mapr.container;
 import ebi.idr_ij.IDR_mapr.containers;
 import ebi.idr_ij.IDR_mapr.type;
-import net.dongliu.commons.Sys;
 import org.apache.commons.lang.text.StrSubstitutor;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.json.JSONWriter;
 
 import java.io.*;
 import java.net.HttpURLConnection;
@@ -41,6 +39,8 @@ public class IDR_API {
         httpCon.setRequestMethod("GET");
         return httpCon;
     }
+
+
 
     public JSONObject JSONObjectScreenWithGene(String gene) throws IOException, JSONException {
         return JSONTypeWith(type.GENE, gene);
@@ -218,6 +218,11 @@ public class IDR_API {
         return json_list;
     }
 
+//    List<Long> LongListFromJSONListImageWithTypeInBoth(String type, String value,String container) throws IOException, JSONException {
+//        List<JSONObject> JsonList = JSONListImageWithTypeInBoth(type, value, container);
+//        JsonList.get(0).getJSONArray("images");
+//    }
+
     static void JSONListImageWithTypeInBothDownload(String type, String value,String container,String path) throws IOException, JSONException {
         FileWriter file_out = new FileWriter(path);
         List<JSONObject> json_list = JSONListImageWithTypeInBoth(type, value, container);
@@ -239,8 +244,28 @@ public class IDR_API {
 //        return null;
 //    }
 
-    List<Long> LongListImagesWithType(String type, String value) throws IOException, JSONException {
-        List<JSONObject> json_list = JSONListImageWithType(type, value);
+    public static List<Long> LongListImageWithTypeInBoth(String type, String value, String container) throws IOException, JSONException {
+        List<Long> json_list;
+        if (container.equals("both")) {
+            json_list = IDR_API.LongListImagesWithTypeInProjects(type, value);
+            json_list.addAll(IDR_API.LongListImagesWithTypeInScreens(type, value));
+        } else {
+            json_list = IDR_API.LongListImagesWithTypeIn(type, value,container);
+        }
+//        System.out.println("JSONListImageWithTypeInBoth");
+//        System.out.println(json_list);
+        return json_list;
+    }
+    static List<Long> LongListImagesWithTypeInProjects(String type, String value) throws IOException, JSONException {
+        return LongListImagesWithTypeIn(type,value,containers.PROJECTS);
+    }
+
+    static List<Long> LongListImagesWithTypeInScreens(String type, String value) throws IOException, JSONException {
+        return LongListImagesWithTypeIn(type,value,containers.SCREENS);
+    }
+
+    static List<Long> LongListImagesWithTypeIn(String type, String value, String container) throws IOException, JSONException {
+        List<JSONObject> json_list = JSONListImageWithTypeIn(type, value,container);
         ArrayList<Long> long_list = new ArrayList<>();
         
         for(JSONObject json:json_list) {

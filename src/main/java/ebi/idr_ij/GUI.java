@@ -11,6 +11,7 @@ import omero.client;
 import omero.gateway.Gateway;
 import omero.gateway.SecurityContext;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.awt.event.*;
 import javax.swing.*;
@@ -22,6 +23,7 @@ import java.io.*;
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Vector;
+import java.util.stream.Collectors;
 
 public class GUI extends javax.swing.JFrame {
     private GUI frame;
@@ -55,8 +57,9 @@ public class GUI extends javax.swing.JFrame {
     private JButton maprDownloadButton;
     private JPanel maprTab;
     private JButton populateListButton;
-    private JPanel byPhenoTab;
+    private JPanel gatewayTab;
     private JComboBox gatewayCombo;
+    private JScrollPane imageListScroller;
 
     private Long ongImageLongValue;
     private Gateway gateway;
@@ -102,6 +105,23 @@ public class GUI extends javax.swing.JFrame {
                     } catch (IOException | JSONException ex) {
                         ex.printStackTrace();
                     }
+                }
+            }
+        });
+        populateListButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String type = JSONtypeCombo.getSelectedItem().toString();
+                String container = JSONcontainerCombo.getSelectedItem().toString();
+                String value = JSONvalue.getText();
+                try {
+                    List<Long> image_list_long = IDR_API.LongListImageWithTypeInBoth(type, value, container);
+                    List<String> image_list_string = image_list_long.stream().map(Object::toString)
+                            .collect(Collectors.toList());
+                    populateList(image_list_string);
+
+                } catch (IOException | JSONException ex) {
+                    ex.printStackTrace();
                 }
             }
         });
@@ -256,6 +276,12 @@ public class GUI extends javax.swing.JFrame {
         vct.addAll(annotationsString);
         imageList.setListData(vct);
     }
+
+//    public void populateList(List<Long> annotationsLong) {
+//        vct = new Vector<Long>();
+//        vct.addAll(annotationsLong);
+//        imageList.setListData(vct);
+//    }
 
     private class GuiOutputStream extends OutputStream {
         JTextArea textArea;
