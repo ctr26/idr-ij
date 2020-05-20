@@ -6,10 +6,12 @@
  *     https://unlicense.org/
  */
 package ebi.idr_ij;
+import Glacier2.CannotCreateSessionException;
+import Glacier2.PermissionDeniedException;
+import net.dongliu.commons.Sys;
 import net.imagej.ImageJ;
 import omero.*;
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import omero.gateway.Gateway;
 import omero.gateway.SecurityContext;
@@ -18,16 +20,13 @@ import omero.gateway.exception.DSOutOfServiceException;
 import omero.gateway.facility.BrowseFacility;
 import omero.gateway.model.DatasetData;
 import omero.gateway.model.ProjectData;
-import org.scijava.ItemIO;
 import org.scijava.command.Command;
-import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 
-import static ebi.idr_ij.IDR_API.JSONListImageWithTypeInBoth;
 import static ebi.idr_ij.IDR_API.JSONListImageWithTypeInBothDownload;
 
 /**
@@ -70,30 +69,35 @@ public class idr_ij implements Command {
 	public static final int port = 0;
 	public Map<String, Long> IDR_projects;
 
-	idr_ij(){
-		try {
-			connection = new Connect(ij);
-			gateway = connection.getGateway();
-			context = connection.getContext();
-			idr_client = connection.getClient();
-		} catch (Exception e) {
-			e.printStackTrace();
-			System.out.println("Connection failed");
-		}
-		try {
-			idr_api = new IDR_API();
-		} catch (IOException e) {
-			e.printStackTrace();
-			System.out.println("API connection failed");
-		}
-		//			ClientConnect clientConnection = new ClientConnect(ij);
-//			context = connect();
-		ij = new ImageJ();
-//		run();
+//	idr_ij(){
+//
+////		run();
+//	}
+
+	void connect_to_idr() throws DSOutOfServiceException, PermissionDeniedException, ServerError, CannotCreateSessionException, IOException {
+		System.out.println("Connecting to gateway");
+		connection = new Connect(ij);
+		gateway = connection.getGateway();
+		context = connection.getContext();
+		idr_client = connection.getClient();
+//		System.out.println("Success");
+		System.out.println("Connecting to IDR API");
+		idr_api = new IDR_API();
+//		System.out.println("Success");
 	}
 
 	@Override
 	public void run() {
+		try {
+			connect_to_idr();
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.out.println("Connection failed");
+		}
+
+		//ClientConnect clientConnection = new ClientConnect(ij);
+		//context = connect();
+		ij = new ImageJ();
 //		ij.launch(args);
 		gui = new GUI(connection,gateway,context,ij,idr_client);
 //		Debug entry point
