@@ -67,7 +67,7 @@ public class IDR_API {
         StrSubstitutor sub = new StrSubstitutor(formatMap, "{", "}");
         String result = sub.replace(url.toString());
 //        JSONObject jsonScreensWithGene = JSONfromURL(new URL(result));
-        System.out.println(result);
+//        System.out.println(result);
         return JSONfromURL(new URL(result));
     }
 
@@ -213,8 +213,8 @@ public class IDR_API {
         } else {
             json_list = IDR_API.JSONListImageWithTypeIn(type, value,container);
         }
-        System.out.println("JSONListImageWithTypeInBoth");
-        System.out.println(json_list);
+//        System.out.println("JSONListImageWithTypeInBoth");
+//        System.out.println(json_list);
         return json_list;
     }
 
