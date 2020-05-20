@@ -47,17 +47,18 @@ public class Images {
         return dos.downloadImage(idr_client, ImageID);
     }
 
-    public static List<String> list_of_images_by_phenotype(SecurityContext context, Gateway gateway, String phenotype) {
+    public static List<Long> list_of_images_by_phenotype(SecurityContext context, Gateway gateway, String phenotype) {
         String key="Phenotype Term Accession";
         String ns="openmicroscopy.org/mapr/phenotype";
 
         List<Long> annotations = Attributes.annotation_ids_by_field(context, gateway,phenotype,key,ns);
-        return annotations.stream()
-                .map(s->String.valueOf(s))
-                .collect(Collectors.toList());
+//        return annotations.stream()
+//                .map(s->String.valueOf(s))
+//                .collect(Collectors.toList());
+        return annotations;
     }
 
-    public static List<String> list_of_images_by(SecurityContext context, Gateway gateway, String accession_type, String value){
+    public static List<Long> list_of_images_by(SecurityContext context, Gateway gateway, String accession_type, String value){
         switch(accession_type) {
             case type.GENE:
 //                Placeholder

@@ -14,10 +14,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 //
 public class IDR_API {
@@ -184,13 +181,15 @@ public class IDR_API {
         List<Long> list_of_plate_ids = new ArrayList<>();
 
         for (Long screen_id : screen_ids) {
-            JSONObject json_plates = JsonTypeWithContainerGivenParent(type, value, container_mids, container_top, String.valueOf(screen_id));
+            JSONObject json_plates = JsonTypeWithContainerGivenParent(type, value, container_mids, container_top,
+                                                                        String.valueOf(screen_id));
             json_list_plates.add(json_plates);
 
             String current_plate_id = json_plates.getJSONArray(container_mids).getJSONObject(0).getString("id");
             list_of_plate_ids.add(Long.parseLong(current_plate_id));
             for (Long plate_ids : list_of_plate_ids) {
-                JSONObject json_images = JsonTypeWithContainerGivenParent(type, value, containers.IMAGES, container_mid, current_plate_id);
+                JSONObject json_images = JsonTypeWithContainerGivenParent(type, value, containers.IMAGES,
+                                                                                container_mid, current_plate_id);
                 json_list_images.add(json_images);
             }
         }
@@ -224,8 +223,9 @@ public class IDR_API {
 //    }
 
     static void JSONListImageWithTypeInBothDownload(String type, String value,String container,String path) throws IOException, JSONException {
-        FileWriter file_out = new FileWriter(path);
         List<JSONObject> json_list = JSONListImageWithTypeInBoth(type, value, container);
+        JSONDownload(new JSONArray(json_list),path);
+
 //        System.out.println(json_list);
 //        System.out.println(json_list.toString());
 //        json_list.toString()
@@ -233,11 +233,16 @@ public class IDR_API {
 //        JSONArray a = new JSONArray(json_list);
 
 //        System.out.println(json_list_string);
-        file_out.write(new JSONArray(json_list).toString(4));
-        file_out.close();
 
 //        JSONWriter json_writer = new JSONWriter(file_out);
 //        json_writer.value(new JSONArray(json_list));
+    }
+
+    static void JSONDownload(JSONArray json, String path) throws IOException, JSONException {
+        FileWriter file_out = new FileWriter(path);
+        file_out.write(json.toString(4));
+        file_out.close();
+
     }
 
 //    Object ImagesWithTypeInDataset(String type, String value,){
@@ -350,6 +355,28 @@ public class IDR_API {
 
     public JSONObject JSONObjectScreenWithPhenotype(String phenotype) throws IOException, JSONException {
         return JSONTypeWith(type.PHENOTYPE, phenotype);
+    }
+
+//    https://idr.openmicroscopy.org/webclient/api/annotations/?type=map&image=5514071
+
+    JSONObject JSONAnnoationFromImageID(Long image_id) throws IOException, JSONException {
+        URL image_url = new URL("https://idr.openmicroscopy.org/webclient/api/annotations/?type=map&image={image_id}");
+//        URL image_url = new URL("https://idr.openmicroscopy.org/mapr/api/{key}/images/?value={value}");
+        HashMap<String, Long> formatMap = new HashMap<>();
+        formatMap.put("image_id", image_id);
+        return JSONMappedURL(image_url, formatMap);
+    }
+
+    JSONArray JSONArrayAnnotationsFromImageID(List<Long> image_ids) throws IOException, JSONException {
+        ArrayList<JSONObject> json_list = new ArrayList<>();
+                for(Long image_id:image_ids){
+                    json_list.add(JSONAnnoationFromImageID(image_id));
+                }
+        return new JSONArray(json_list);
+    }
+
+    void DownloadJsonArrayAnnotations(List<Long> image_ids, String path) throws IOException, JSONException {
+        JSONDownload(JSONArrayAnnotationsFromImageID(image_ids),path);
     }
 
     @Deprecated //Doesn't work

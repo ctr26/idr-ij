@@ -21,6 +21,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.*;
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
 import java.util.stream.Collectors;
@@ -65,7 +66,7 @@ public class GUI extends javax.swing.JFrame {
     private Gateway gateway;
     private ImageJ ij;
     private String genotypeText;
-    private Vector<String> vct;
+    private List<Long> image_id_list = new Vector<Long>();
 
     public GUI(Connect connection, Gateway gateway, SecurityContext context, ImageJ ij, client idr_client)  {
         this.connection = connection;
@@ -102,6 +103,7 @@ public class GUI extends javax.swing.JFrame {
                     String value = JSONvalue.getText();
                     try {
                         IDR_API.JSONListImageWithTypeInBothDownload(type,value,container,path);
+//                        IDR_API.DownloadJsonArrayAnnotations()
                     } catch (IOException | JSONException ex) {
                         ex.printStackTrace();
                     }
@@ -116,9 +118,7 @@ public class GUI extends javax.swing.JFrame {
                 String value = JSONvalue.getText();
                 try {
                     List<Long> image_list_long = IDR_API.LongListImageWithTypeInBoth(type, value, container);
-                    List<String> image_list_string = image_list_long.stream().map(Object::toString)
-                            .collect(Collectors.toList());
-                    populateList(image_list_string);
+                    populateList(image_list_long);
 
                 } catch (IOException | JSONException ex) {
                     ex.printStackTrace();
@@ -172,20 +172,20 @@ public class GUI extends javax.swing.JFrame {
             public void actionPerformed(ActionEvent e) {
                 String accession_type = (String) gatewayCombo.getSelectedItem().toString();
                 System.out.println("From phentotype: ".concat(phenotypeField.getText()));
-                List<String> annotationsString = Images.list_of_images_by(context, gateway,type.PHENOTYPE,
+                List<Long> annotationsLong = Images.list_of_images_by(context, gateway,type.PHENOTYPE,
                         phenotypeField.getText());
-                System.out.println("Found images with IDS:\n".concat(String.join(",", annotationsString)));
-                populateList(annotationsString);
+                System.out.println("Found images with IDS:\n".concat(String.join(",", annotationsLong.toString())));
+                populateList(annotationsLong);
             }
         });
 
         openImages.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                for (String current_id_string : vct) {
+                for (Long current_id_long : image_id_list) {
                     try {
 //                        int current_id_int = Integer.parseInt(current_id_string);
-                        Long current_id_long = Long.parseLong(current_id_string);
+//                        Long current_id_long = Long.parseLong(current_id_string);
                         Dataset ij_image = Images.get_ij_dataset(ij, idr_client, current_id_long);
                         ij.ui().show(ij_image);
                     } catch (IOException | ServerError ex) {
@@ -271,10 +271,21 @@ public class GUI extends javax.swing.JFrame {
         this.revalidate();
     }
 
-    public void populateList(List<String> annotationsString) {
-         vct = new Vector<String>();
-        vct.addAll(annotationsString);
-        imageList.setListData(vct);
+    public void populateList(List<Long> annoationsLong) {
+        image_id_list = new ArrayList<Long>();
+        image_id_list.addAll(annoationsLong);
+
+        List<String> image_list_string = image_id_list.stream().map(Object::toString)
+                .collect(Collectors.toList());
+        Vector<String> image_vector_string = new Vector<String>();
+        image_vector_string.addAll(image_list_string);
+        imageList.setListData(image_vector_string);
+    }
+
+    public List<Long> readList(){
+//        imageList.getSelectedValuesList();
+//        imageList.get
+        return image_id_list;
     }
 
 //    public void populateList(List<Long> annotationsLong) {
